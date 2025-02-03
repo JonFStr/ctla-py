@@ -2,7 +2,9 @@ import typing
 from dataclasses import dataclass
 from datetime import datetime
 
+from EventFile import EventFile
 from Facts import Facts
+from ..config import churchtools as ctc
 
 
 @dataclass
@@ -17,6 +19,9 @@ class Event:
 
     facts: Facts
 
+    yt_link: EventFile | None = None
+    yt_thumbnail: EventFile | None = None
+
     @classmethod
     def from_api_json(cls, event: dict[str, typing.Any], facts: dict[str, int | str]):
         """
@@ -25,6 +30,10 @@ class Event:
         :param facts: Result from /events/`ID`/facts
         :return:
         """
+        # Find attached files we care about
+        yt_link_data = next((f for f in event['eventFiles'] if f['title'] == ctc.stream_attachment_name), None)
+        yt_thumb_data = next((f for f in event['eventFiles'] if f['title'] == ctc.thumbnail_name), None)
+
         return cls(
             id=event['id'],
             category_id=event['calendar']['domainIdentifier'],
@@ -32,5 +41,7 @@ class Event:
             end_time=datetime.fromisoformat(event['endDate']),
             title=event['name'],
             description=event['description'],
-            facts=Facts.from_api_json(facts)
+            facts=Facts.from_api_json(facts),
+            yt_link=EventFile.from_api_json(yt_link_data) if yt_link_data is not None else None,
+            yt_thumbnail=EventFile.from_api_json(yt_thumb_data) if yt_thumb_data is not None else None,
         )
