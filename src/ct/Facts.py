@@ -1,0 +1,73 @@
+from dataclasses import dataclass
+from enum import Enum, auto
+
+from ..config import churchtools as ctc
+
+
+class ManageStreamBehavior(Enum):
+    YES = auto()
+    NO = auto()
+    IGNORE = auto()
+
+
+class YtVisibility(Enum):
+    VISIBLE = auto()
+    UNLISTED = auto()
+    PRIVATE = auto()
+
+
+@dataclass
+class Facts:
+    """Class holding facts for an event"""
+    behavior: ManageStreamBehavior
+    visibility: YtVisibility
+    link_in_cal: bool
+    on_homepage: bool
+
+    @classmethod
+    def from_api_json(cls, facts: dict[str, int | str]):
+        """Create instance from API results"""
+        # Behavior
+        bf = facts.get(ctc.manage_stream_behavior_fact.name, ctc.manage_stream_behavior_fact.default)
+        if bf == ctc.manage_stream_behavior_fact.yes_value:
+            behavior = ManageStreamBehavior.YES
+        elif bf == ctc.manage_stream_behavior_fact.ignore_value:
+            behavior = ManageStreamBehavior.IGNORE
+        else:
+            behavior = ManageStreamBehavior.NO
+
+        # Link in Calendar
+        lf = facts.get(ctc.include_in_cal_fact.name)
+        if lf is not None:
+            link_in_cal = lf == ctc.include_in_cal_fact.yes_value
+        else:
+            link_in_cal = ctc.include_in_cal_fact.default
+
+        # Visibility
+        vf = facts.get(ctc.stream_visibility_fact.name, ctc.stream_visibility_fact.default)
+        if vf == ctc.stream_visibility_fact.visible_value:
+            visibility = YtVisibility.VISIBLE
+        elif vf == ctc.stream_visibility_fact.unlisted_value:
+            visibility = YtVisibility.UNLISTED
+        elif vf == ctc.stream_visibility_fact.private_value:
+            visibility = YtVisibility.PRIVATE
+        else:
+            raise ValueError(
+                f'Unexpected Value for YouTube-Visibility-Fact ("{ctc.stream_visibility_fact.name}"): "{vf}"\n'
+                f'Needs to be one of "{ctc.stream_visibility_fact.visible_value}", '
+                f'"{ctc.stream_visibility_fact.unlisted_value}" or '
+                f'"{ctc.stream_visibility_fact.private_value}", according to configuration.')
+
+        # On Homepage
+        hf = facts.get(ctc.show_on_homepage_fact.name)
+        if hf is not None:
+            on_homepage = hf == ctc.show_on_homepage_fact.yes_value
+        else:
+            on_homepage = ctc.show_on_homepage_fact.default
+
+        return Facts(
+            behavior=behavior,
+            link_in_cal=link_in_cal,
+            visibility=visibility,
+            on_homepage=on_homepage
+        )
