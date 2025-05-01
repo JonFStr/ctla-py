@@ -42,6 +42,6 @@ class Event:
             title=event['name'],
             description=event['description'],
             facts=Facts.from_api_json(facts),
-            yt_link=EventFile.from_api_json(yt_link_data) if yt_link_data is not None else None,
-            yt_thumbnail=EventFile.from_api_json(yt_thumb_data) if yt_thumb_data is not None else None,
+            yt_link=EventFile.from_event_api_json(yt_link_data) if yt_link_data is not None else None,
+            yt_thumbnail=EventFile.from_event_api_json(yt_thumb_data) if yt_thumb_data is not None else None,
         )
