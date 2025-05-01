@@ -23,7 +23,7 @@ class Event:
     yt_thumbnail: EventFile | None = None
 
     @classmethod
-    def from_api_json(cls, event: dict[str, typing.Any], facts: dict[str, int | str]):
+    def from_api_json(cls, event: dict[str, typing.Any], facts: dict[str, int | str]) -> 'Event':
         """
         Create instance from API results
         :param event: Result from /events
