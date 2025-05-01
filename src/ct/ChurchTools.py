@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 import requests
 
 from Event import Event
+from src.ct.EventFile import EventFile, EventFileType
 
 
 class ChurchTools:
@@ -55,6 +56,16 @@ class ChurchTools:
         url = urljoin(self.instance, path)
         return requests.post(url, json=json, headers=self.__headers)
 
+    def _do_delete(self, path: str):
+        """
+        Perform DELETE request to ChurchTools
+
+        :param path: The API endpoint
+        :return: The `requests`-library's Response-object.
+        """
+        url = urljoin(self.instance, path)
+        return requests.delete(url, headers=self.__headers)
+
     def cache_facts(self):
         """Cache the fact masterdata in this instance. Do nothing if cache exists"""
         if self._facts_cache is not None:
@@ -95,3 +106,38 @@ class ChurchTools:
             facts = self.get_event_facts(event['id'])
             # noinspection PyTypeChecker
             yield Event.from_api_json(event, facts)
+
+    def set_stream_link(self, event: Event, link: str) -> bool:
+        """
+        Set the YT-Stream Link for an event to the given link
+        :param event: The ChurchTools Event to set the link for
+        :param link: The link to be set
+        :return True, if successful
+        """
+        r = self._do_post(f'/files/service/{event.id}/link', {'name': 'YouTube-Stream', 'url': link})
+
+        if r.status_code != 201:
+            print(f'Error when setting stream link on ChurchTools [{r.status_code}]: "{r.content}"', file=stderr)
+            return False
+
+        # Write new link into Event object
+        response_data = r.json()['data']
+        event.yt_link = EventFile(
+            id=response_data['domainId'],
+            type=EventFileType.LINK,
+            name=response_data['name'],
+            url=response_data['fileUrl']
+        )
+        return True
+
+    def delete_stream_link(self, event: Event) -> bool:
+        """
+        Delete the Stream Link from an event
+        :param event: The event to delete the stream link from
+        :return: True on success
+        """
+        r = self._do_delete(f'/files/{event.yt_link.id}')
+        if r.status_code != 204:
+            print(f'Error when deleting stream link on ChurchTools [{r.status_code}]: "{r.content}"', file=stderr)
+            return False
+        return True
