@@ -2,7 +2,14 @@ import json
 import os.path
 from typing import TypedDict
 
-from .config_churchtools_dataclasses import ChurchToolsConf
+from .configs.churchtools import ChurchToolsConf
+
+# Easy access to loaded config
+churchtools: ChurchToolsConf
+youtube: None
+wordpress: None
+# noinspection PyTypeChecker
+churchtools, youtube, wordpress = {}, {}, {}
 
 
 class Config(TypedDict):
@@ -54,7 +61,16 @@ def _load_default_config() -> Config:
 
 
 def _load_user_config() -> Config:
-    pass  # TODO
+    """
+    Load user-defined configuration file.
+
+    Defaults to the file named '`ctla_config.json`' in the current working directory,
+    or the file passed via `-c` / `--config`, if set
+
+    :return: The config dict parsed from the file
+    """
+    with open('ctla_config.json', 'r') as user_conffile:
+        return json.load(user_conffile)
 
 
 def _load_env_config() -> Config:
@@ -92,7 +108,7 @@ def _load_cli_params() -> Config:
     pass  # TODO
 
 
-def load_config() -> tuple[ChurchToolsConf, None, None]:
+def load():
     """
     Load the configuration in the following order (later takes precedence):
 
@@ -100,9 +116,6 @@ def load_config() -> tuple[ChurchToolsConf, None, None]:
     2. User-supplied config file
     3. Environment Variables
     4. CLI Parameters
-
-
-    :return: The three top-tier config dicts
     """
     # Order is: file < environment < CLI (CLI takes precedence)
     config: Config = dict()
@@ -120,4 +133,7 @@ def load_config() -> tuple[ChurchToolsConf, None, None]:
     # Load CLI parameters
     combine_into(_load_cli_params(), config)
 
-    return config['churchtools'], config['youtube'], config['wordpress']
+    global churchtools, youtube, wordpress
+    churchtools = config['churchtools']
+    youtube = config['youtube']
+    wordpress = config['wordpress']
