@@ -16,9 +16,9 @@ class ChurchTools:
     The ChurchTools-API main class.
     """
 
-    instance: str
+    urlbase: str
     token: str
-    _facts_cache: dict[int, str]
+    _facts_cache: dict[int, str] = None
 
     def __init__(self, instance: str, token: str):
         """
@@ -27,7 +27,7 @@ class ChurchTools:
         :param instance: The hostname of the instance
         :param token: The API Token of the user
         """
-        self.instance = instance
+        self.urlbase = urljoin(instance, '/api')
         self.token = token
 
     @property
@@ -42,7 +42,7 @@ class ChurchTools:
         :param kwargs: Query parameters
         :return: The `requests`-library's Response-object.
         """
-        url = urljoin(self.instance, path)
+        url = self.urlbase + path
         return requests.get(url, params=kwargs, headers=self.__headers)
 
     def _do_post(self, path: str, json: dict[str, Any]):
@@ -53,7 +53,7 @@ class ChurchTools:
         :param json: JSON encodable request body
         :return: The `requests`-library's Response-object.
         """
-        url = urljoin(self.instance, path)
+        url = self.urlbase + path
         return requests.post(url, json=json, headers=self.__headers)
 
     def _do_delete(self, path: str):
@@ -63,7 +63,7 @@ class ChurchTools:
         :param path: The API endpoint
         :return: The `requests`-library's Response-object.
         """
-        url = urljoin(self.instance, path)
+        url = self.urlbase + path
         return requests.delete(url, headers=self.__headers)
 
     def cache_facts(self):
@@ -85,7 +85,7 @@ class ChurchTools:
             print(f'Response error when fetching facts for {event_id} [{r.status_code}]: "{r.content}"', file=stderr)
             return None
 
-        return {self._facts_cache[fact['id']]: fact['value'] for fact in r.json()['data']}
+        return {self._facts_cache[fact['factId']]: fact['value'] for fact in r.json()['data']}
 
     def get_upcoming_events(self, days: int) -> Generator[Event] | None:
         """
