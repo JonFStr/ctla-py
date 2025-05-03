@@ -16,6 +16,7 @@ class Event:
     end_time: datetime
     title: str
     description: str
+    isCanceled: bool
 
     facts: Facts
 
@@ -41,6 +42,7 @@ class Event:
             end_time=datetime.fromisoformat(event['endDate']),
             title=event['name'],
             description=event['description'],
+            isCanceled=event['isCanceled'],
             facts=Facts.from_api_json(facts),
             yt_link=EventFile.from_event_api_json(yt_link_data) if yt_link_data is not None else None,
             yt_thumbnail=EventFile.from_event_api_json(yt_thumb_data) if yt_thumb_data is not None else None,

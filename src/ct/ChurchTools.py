@@ -1,9 +1,9 @@
 import datetime
+import urllib.parse
 from collections.abc import Generator
 from datetime import timedelta
 from sys import stderr
 from typing import Any
-from urllib.parse import urljoin
 
 import requests
 
@@ -27,7 +27,7 @@ class ChurchTools:
         :param instance: The hostname of the instance
         :param token: The API Token of the user
         """
-        self.urlbase = urljoin(instance, '/api')
+        self.urlbase = urllib.parse.urlunsplit(('https', instance, '/api', '', ''))
         self.token = token
 
     @property
@@ -90,14 +90,14 @@ class ChurchTools:
     def get_upcoming_events(self, days: int) -> Generator[Event] | None:
         """
         Load and return events from ChurchTools
-        :param days: How many days to load in advance
+        :param days: How many days to load in advance (including the current day)
         :return: A list of Events, or None, when an error occurred
         """
         # Compute date instance for filter end date
         from_limit = datetime.date.today().isoformat()
         to_limit = (datetime.date.today() + timedelta(days=days)).isoformat()
 
-        r = self._do_get('/events', canceled=False, direction='forward', limit=20, **{'from': from_limit}, to=to_limit)
+        r = self._do_get('/events', canceled=True, **{'from': from_limit}, to=to_limit)
         if r.status_code != 200:
             print(f'Response error when fetching upcoming events [{r.status_code}]: "{r.content}"', file=stderr)
             return None
