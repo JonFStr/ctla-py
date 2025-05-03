@@ -1,1 +1,6 @@
+# Application Config
 /ctla_config.json
+/youtube_credentials.json
+
+# Google API credentials
+/client_secret*.json

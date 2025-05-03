@@ -30,6 +30,11 @@
     "speaker_service_name": "Speaker",
     "stream_attachment_name": "YouTube-Stream"
   },
-  "youtube": {},
+  "youtube": {
+    "redirect_url": "http://localhost:8080/",
+    "redirect_port": 8080,
+    "client_secrets_file": "client_secrets.json",
+    "credentials_file": "youtube_credentials.json"
+  },
   "wordpress": {}
 }

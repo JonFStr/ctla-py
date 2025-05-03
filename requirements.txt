@@ -1,1 +1,6 @@
 requests~=2.32.3
+google-api-python-client~=2.169.0
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+protobuf~=6.30.2

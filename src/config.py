@@ -4,6 +4,7 @@ from typing import TypedDict
 
 from . import args
 from .configs.churchtools import ChurchToolsConf
+from .configs.youtube import YouTubeConf
 
 
 class Config(TypedDict):
@@ -11,13 +12,13 @@ class Config(TypedDict):
     CTLA Main Configuration
     """
     churchtools: ChurchToolsConf
-    youtube: None
+    youtube: YouTubeConf
     wordpress: None
 
 
 # Easy access to loaded config
 churchtools: ChurchToolsConf
-youtube: None
+youtube: YouTubeConf
 wordpress: None
 # noinspection PyTypeChecker
 churchtools, youtube, wordpress = {}, {}, {}
