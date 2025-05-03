@@ -33,3 +33,5 @@ def parse():
 
     parser = _setup_parser()
     parsed = parser.parse_args()
+
+    print('Application initialized.')

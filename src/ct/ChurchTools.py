@@ -23,6 +23,7 @@ class ChurchTools:
 
     @classmethod
     def create(cls):
+        """Helper method to create object with default configuration parameters"""
         return cls(config.churchtools['instance'], config.churchtools['token'])
 
     def __init__(self, instance: str, token: str):
@@ -34,6 +35,8 @@ class ChurchTools:
         """
         self.urlbase = urllib.parse.urlunsplit(('https', instance, '/api', '', ''))
         self.token = token
+
+        print('Initialized ChurchTools API.')
 
     @property
     def __headers(self):

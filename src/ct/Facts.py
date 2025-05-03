@@ -55,7 +55,8 @@ class Facts:
             visibility = YtVisibility.PRIVATE
         else:
             raise ValueError(
-                f'Unexpected Value for YouTube-Visibility-Fact ("{config.churchtools['stream_visibility_fact']['name']}"): "{vf}"\n'
+                f'Unexpected Value for YouTube-Visibility-Fact '
+                f'("{config.churchtools['stream_visibility_fact']['name']}"): "{vf}"\n'
                 f'Needs to be one of "{config.churchtools['stream_visibility_fact']['visible_value']}", '
                 f'"{config.churchtools['stream_visibility_fact']['unlisted_value']}" or '
                 f'"{config.churchtools['stream_visibility_fact']['private_value']}", according to configuration.')

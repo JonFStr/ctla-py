@@ -147,3 +147,5 @@ def load():
     churchtools = config['churchtools']
     youtube = config['youtube']
     wordpress = config['wordpress']
+
+    print('Configuration loaded.')
