@@ -2,6 +2,7 @@ import json
 import os.path
 from typing import TypedDict
 
+from . import args
 from .configs.churchtools import ChurchToolsConf
 
 
@@ -70,8 +71,7 @@ def _load_user_config() -> Config:
 
     :return: The config dict parsed from the file
     """
-    with open('ctla_config.json', 'r') as user_conffile:
-        return json.load(user_conffile)
+    return json.load(args.parsed.config)
 
 
 def _load_env_config() -> Config:
