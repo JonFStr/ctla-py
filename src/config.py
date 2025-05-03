@@ -106,7 +106,16 @@ def _load_env_config() -> Config:
 
 
 def _load_cli_params() -> Config:
-    pass  # TODO
+    """
+    Load CLI parameters into a Config dict and return it.
+
+    Values that are not set from CLI will be stripped from the dictionary.
+    This function ensures proper types for the returned values.
+
+    :return: The config dict
+    """
+    # noinspection PyTypeChecker
+    return {}  # currently nothing is configurable via cli
 
 
 def load():
