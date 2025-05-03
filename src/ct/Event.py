@@ -2,8 +2,8 @@ import typing
 from dataclasses import dataclass
 from datetime import datetime
 
-from EventFile import EventFile
-from Facts import Facts
+from .EventFile import EventFile
+from .Facts import Facts
 from ..config import churchtools as ctc
 
 

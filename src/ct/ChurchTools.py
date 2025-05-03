@@ -7,8 +7,8 @@ from urllib.parse import urljoin
 
 import requests
 
-from Event import Event
-from src.ct.EventFile import EventFile, EventFileType
+from .Event import Event
+from .EventFile import EventFile, EventFileType
 
 
 class ChurchTools:
