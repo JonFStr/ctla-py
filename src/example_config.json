@@ -16,7 +16,18 @@
       "private_value": "Private",
       "default": "Only via a link"
     },
+    "include_in_cal_fact": {
+      "name": "Livestream in calendar",
+      "yes_value": "Yes",
+      "default": false
+    },
+    "show_on_homepage_fact": {
+      "name": "Livestream on Homepage",
+      "yes_value": "Yes",
+      "default": false
+    },
     "thumbnail_name": "YouTube-Thumbnail",
+    "speaker_service_name": "Speaker",
     "stream_attachment_name": "YouTube-Stream"
   },
   "youtube": {},

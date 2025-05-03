@@ -4,13 +4,6 @@ from typing import TypedDict
 
 from .configs.churchtools import ChurchToolsConf
 
-# Easy access to loaded config
-churchtools: ChurchToolsConf
-youtube: None
-wordpress: None
-# noinspection PyTypeChecker
-churchtools, youtube, wordpress = {}, {}, {}
-
 
 class Config(TypedDict):
     """
@@ -19,6 +12,14 @@ class Config(TypedDict):
     churchtools: ChurchToolsConf
     youtube: None
     wordpress: None
+
+
+# Easy access to loaded config
+churchtools: ChurchToolsConf
+youtube: None
+wordpress: None
+# noinspection PyTypeChecker
+churchtools, youtube, wordpress = {}, {}, {}
 
 
 def combine_into(delta: dict, combined: dict) -> None:
@@ -56,7 +57,7 @@ def filter_none[T: dict](target: T) -> T:
 
 
 def _load_default_config() -> Config:
-    with open(os.path.join(os.path.dirname(__file__), 'default_config.json'), 'r') as default_file:
+    with open(os.path.join(os.path.dirname(__file__), 'configs/default_config.json'), 'r') as default_file:
         return json.load(default_file)
 
 

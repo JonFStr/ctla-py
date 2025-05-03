@@ -21,7 +21,11 @@ class ChurchTools:
     token: str
     _facts_cache: dict[int, str] = None
 
-    def __init__(self, instance: str = config.churchtools['instance'], token: str = config.churchtools['token']):
+    @classmethod
+    def create(cls):
+        return cls(config.churchtools['instance'], config.churchtools['token'])
+
+    def __init__(self, instance: str, token: str):
         """
         Construct a new ChurchTools-Api instance.
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 
-from ..config import churchtools as ctconf
+from .. import config
 
 
 class ManageStreamBehavior(Enum):
@@ -28,42 +28,44 @@ class Facts:
     def from_api_json(cls, facts: dict[str, int | str]):
         """Create instance from API results"""
         # Behavior
-        bf = facts.get(ctconf['manage_stream_behavior_fact']['name'], ctconf['manage_stream_behavior_fact']['default'])
-        if bf == ctconf['manage_stream_behavior_fact']['yes_value']:
+        bf = facts.get(config.churchtools['manage_stream_behavior_fact']['name'],
+                       config.churchtools['manage_stream_behavior_fact']['default'])
+        if bf == config.churchtools['manage_stream_behavior_fact']['yes_value']:
             behavior = ManageStreamBehavior.YES
-        elif bf == ctconf['manage_stream_behavior_fact']['ignore_value']:
+        elif bf == config.churchtools['manage_stream_behavior_fact']['ignore_value']:
             behavior = ManageStreamBehavior.IGNORE
         else:
             behavior = ManageStreamBehavior.NO
 
         # Link in Calendar
-        lf = facts.get(ctconf['include_in_cal_fact']['name'])
+        lf = facts.get(config.churchtools['include_in_cal_fact']['name'])
         if lf is not None:
-            link_in_cal = lf == ctconf['include_in_cal_fact']['yes_value']
+            link_in_cal = lf == config.churchtools['include_in_cal_fact']['yes_value']
         else:
-            link_in_cal = ctconf['include_in_cal_fact']['default']
+            link_in_cal = config.churchtools['include_in_cal_fact']['default']
 
         # Visibility
-        vf = facts.get(ctconf['stream_visibility_fact']['name'], ctconf['stream_visibility_fact']['default'])
-        if vf == ctconf['stream_visibility_fact']['visible_value']:
+        vf = facts.get(config.churchtools['stream_visibility_fact']['name'],
+                       config.churchtools['stream_visibility_fact']['default'])
+        if vf == config.churchtools['stream_visibility_fact']['visible_value']:
             visibility = YtVisibility.VISIBLE
-        elif vf == ctconf['stream_visibility_fact']['unlisted_value']:
+        elif vf == config.churchtools['stream_visibility_fact']['unlisted_value']:
             visibility = YtVisibility.UNLISTED
-        elif vf == ctconf['stream_visibility_fact']['private_value']:
+        elif vf == config.churchtools['stream_visibility_fact']['private_value']:
             visibility = YtVisibility.PRIVATE
         else:
             raise ValueError(
-                f'Unexpected Value for YouTube-Visibility-Fact ("{ctconf['stream_visibility_fact']['name']}"): "{vf}"\n'
-                f'Needs to be one of "{ctconf['stream_visibility_fact']['visible_value']}", '
-                f'"{ctconf['stream_visibility_fact']['unlisted_value']}" or '
-                f'"{ctconf['stream_visibility_fact']['private_value']}", according to configuration.')
+                f'Unexpected Value for YouTube-Visibility-Fact ("{config.churchtools['stream_visibility_fact']['name']}"): "{vf}"\n'
+                f'Needs to be one of "{config.churchtools['stream_visibility_fact']['visible_value']}", '
+                f'"{config.churchtools['stream_visibility_fact']['unlisted_value']}" or '
+                f'"{config.churchtools['stream_visibility_fact']['private_value']}", according to configuration.')
 
         # On Homepage
-        hf = facts.get(ctconf['show_on_homepage_fact']['name'])
+        hf = facts.get(config.churchtools['show_on_homepage_fact']['name'])
         if hf is not None:
-            on_homepage = hf == ctconf['show_on_homepage_fact']['yes_value']
+            on_homepage = hf == config.churchtools['show_on_homepage_fact']['yes_value']
         else:
-            on_homepage = ctconf['show_on_homepage_fact']['default']
+            on_homepage = config.churchtools['show_on_homepage_fact']['default']
 
         return Facts(
             behavior=behavior,

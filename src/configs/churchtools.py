@@ -89,10 +89,10 @@ class ChurchToolsConf(TypedDict):
 
     manage_stream_behavior_fact: ManageStreamBehaviorConf
     stream_visibility_fact: StreamVisibilityConf
-    include_in_cal_fact: IncludeInCalConf
-    show_on_homepage_fact: ShowOnHomepageConf
+    include_in_cal_fact: IncludeInCalConf | None
+    show_on_homepage_fact: ShowOnHomepageConf | None
 
-    speaker_service_name: str
+    speaker_service_name: str | None
 
-    thumbnail_name: str
+    thumbnail_name: str | None
     stream_attachment_name: str

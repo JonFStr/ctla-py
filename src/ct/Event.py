@@ -4,7 +4,7 @@ from datetime import datetime
 
 from .EventFile import EventFile
 from .Facts import Facts
-from ..config import churchtools as ctc
+from .. import config
 
 
 @dataclass
@@ -32,8 +32,10 @@ class Event:
         :return:
         """
         # Find attached files we care about
-        yt_link_data = next((f for f in event['eventFiles'] if f['title'] == ctc['stream_attachment_name']), None)
-        yt_thumb_data = next((f for f in event['eventFiles'] if f['title'] == ctc['thumbnail_name']), None)
+        yt_link_data = next(
+            (f for f in event['eventFiles'] if f['title'] == config.churchtools['stream_attachment_name']), None)
+        yt_thumb_data = next((f for f in event['eventFiles'] if f['title'] == config.churchtools['thumbnail_name']),
+                             None)
 
         return cls(
             id=event['id'],
