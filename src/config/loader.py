@@ -27,6 +27,26 @@ def combine_into(delta: dict, combined: dict) -> None:
             combined[k] = v
 
 
+def _load_default_config() -> Config:
+    with open(os.path.join(os.path.dirname(__file__), 'default_config.json'), 'r') as default_file:
+        return json.load(default_file)
+
+
+def _load_user_config() -> Config:
+    pass  # TODO
+
+
+def _load_env_config() -> Config:
+    for k, v in os.environ.items():
+        if not k.startswith('CTLA_'):
+            continue
+        # TODO
+
+
+def _load_cli_params() -> Config:
+    pass  # TODO
+
+
 def load_config() -> tuple[ChurchToolsConf, None, None]:
     """
     Load the configuration in the following order (later takes precedence):
@@ -39,38 +59,19 @@ def load_config() -> tuple[ChurchToolsConf, None, None]:
 
     :return: The three top-tier config dicts
     """
-    # Order is: file < envvar < CLI (CLI takes precedence)
+    # Order is: file < environment < CLI (CLI takes precedence)
     config: Config = dict()
 
-    # ====================
     # Load default config
-    default_file = open(os.path.join(os.path.dirname(__file__), 'default_config.json'), 'r')
-    default_config: Config = json.load(default_file)
-    default_file.close()
-    del default_file
+    combine_into(_load_default_config(), config)
 
-    combine_into(default_config, config)
-    del default_config
-
-    # ====================
     # Load user-given config
-    user_config = dict()  # TODO
+    combine_into(_load_user_config(), config)
 
-    combine_into(user_config, config)
-    del user_config
-
-    # ====================
     # Load ENV parameters
-    env_config = dict()  # TODO
+    combine_into(_load_env_config(), config)
 
-    combine_into(env_config, config)
-    del env_config
-
-    # ====================
     # Load CLI parameters
-    cli_config = dict()  # TODO
-
-    combine_into(cli_config, config)
-    del cli_config
+    combine_into(_load_cli_params(), config)
 
     return config['churchtools'], config['youtube'], config['wordpress']
