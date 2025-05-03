@@ -1,34 +1,34 @@
 {
   "churchtools": {
     "instance": "churchtools.test",
-    "token": "API_TOKEN",
+    "token": "API_TOKEN_HERE",
     "days_to_load": 7,
     "manage_stream_behavior_fact": {
       "name": "Livestream",
-      "yes_value": "Ja",
-      "ignore_value": "Ignorieren",
-      "default": "Nein"
+      "yes_value": "Yes",
+      "ignore_value": "Ignore",
+      "default": "No"
     },
     "stream_visibility_fact": {
-      "name": "Livestream Sichtbarkeit",
-      "visible_value": "Öffentlich",
-      "unlisted_value": "Nur über einen Link",
-      "private_value": "Privat",
-      "default": "Nur über einen Link"
+      "name": "Livestream Visibilty",
+      "visible_value": "Public",
+      "unlisted_value": "Only via a link",
+      "private_value": "Private",
+      "default": "Only via a link"
     },
     "include_in_cal_fact": {
-      "name": "Livestream im Kalender",
-      "yes_value": "Ja",
+      "name": "Livestream in calendar",
+      "yes_value": "Yes",
+      "default": false
+    },
+    "show_on_homepage_fact": {
+      "name": "Livestream on Homepage",
+      "yes_value": "Yes",
       "default": false
     },
     "thumbnail_name": "YouTube-Thumbnail",
-    "speaker_service_name": "Predigt",
-    "stream_attachment_name": "YouTube-Stream",
-    "show_on_homepage_fact": {
-      "name": "Livestream auf Homepage",
-      "yes_value": "Ja",
-      "default": false
-    }
+    "speaker_service_name": "Speaker",
+    "stream_attachment_name": "YouTube-Stream"
   },
   "youtube": {},
   "wordpress": {}
