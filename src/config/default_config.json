@@ -1,0 +1,35 @@
+{
+  "churchtools": {
+    "instance": "churchtools.test",
+    "token": "API_TOKEN",
+    "days_to_load": 7,
+    "manage_stream_behavior_fact": {
+      "name": "Livestream",
+      "yes_value": "Ja",
+      "ignore_value": "Ignorieren",
+      "default": "Nein"
+    },
+    "stream_visibility_fact": {
+      "name": "Livestream Sichtbarkeit",
+      "visible_value": "Öffentlich",
+      "unlisted_value": "Nur über einen Link",
+      "private_value": "Privat",
+      "default": "Nur über einen Link"
+    },
+    "include_in_cal_fact": {
+      "name": "Livestream im Kalender",
+      "yes_value": "Ja",
+      "default": false
+    },
+    "thumbnail_name": "YouTube-Thumbnail",
+    "speaker_service_name": "Predigt",
+    "stream_attachment_name": "YouTube-Stream",
+    "show_on_homepage_fact": {
+      "name": "Livestream auf Homepage",
+      "yes_value": "Ja",
+      "default": false
+    }
+  },
+  "youtube": {},
+  "wordpress": {}
+}

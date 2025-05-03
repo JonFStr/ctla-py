@@ -1,8 +1,7 @@
-from dataclasses import dataclass
+from typing import TypedDict
 
 
-@dataclass
-class ManageStreamBehaviorConf:
+class ManageStreamBehaviorConf(TypedDict):
     """
     Dataclass configuring the ChurchTools fact for Stream Behavior
 
@@ -19,8 +18,7 @@ class ManageStreamBehaviorConf:
     default: str
 
 
-@dataclass
-class StreamVisibilityConf:
+class StreamVisibilityConf(TypedDict):
     """
     Dataclass configuring the ChurchTools fact for Stream Visibility
 
@@ -39,8 +37,7 @@ class StreamVisibilityConf:
     default: str
 
 
-@dataclass
-class IncludeInCalConf:
+class IncludeInCalConf(TypedDict):
     """
     Dataclass configuring the ChurchTools fact for including the stream link inside the calendar entry
 
@@ -55,8 +52,7 @@ class IncludeInCalConf:
     default: bool
 
 
-@dataclass
-class ShowOnHomepageConf:
+class ShowOnHomepageConf(TypedDict):
     """
     Dataclass configuring the ChurchTools fact for showing the stream on the WordPress site
 
@@ -71,8 +67,7 @@ class ShowOnHomepageConf:
     default: bool
 
 
-@dataclass
-class ChurchToolsConf:
+class ChurchToolsConf(TypedDict):
     """
     Datatclass holding configuration about ChurchTools
 
@@ -101,13 +96,3 @@ class ChurchToolsConf:
 
     thumbnail_name: str
     stream_attachment_name: str
-
-
-@dataclass
-class Config:
-    """
-    CTLA Main Configuration
-    """
-    churchtools: ChurchToolsConf
-    youtube: None
-    wordpress: None
