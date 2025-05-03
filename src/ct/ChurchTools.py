@@ -9,6 +9,7 @@ import requests
 
 from .Event import Event
 from .EventFile import EventFile, EventFileType
+from .. import config
 
 
 class ChurchTools:
@@ -20,7 +21,7 @@ class ChurchTools:
     token: str
     _facts_cache: dict[int, str] = None
 
-    def __init__(self, instance: str, token: str):
+    def __init__(self, instance: str = config.churchtools['instance'], token: str = config.churchtools['token']):
         """
         Construct a new ChurchTools-Api instance.
 
