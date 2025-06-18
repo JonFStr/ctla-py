@@ -1,7 +1,9 @@
 """
 This file holds helper classes for type hints
 """
-from typing import TypedDict
+from typing import TypedDict, Literal
+
+PrivacyStatus = Literal['private', 'public', 'unlisted']
 
 
 class BroadcastSnippet(TypedDict):

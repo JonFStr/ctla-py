@@ -1,11 +1,12 @@
 import logging
+from datetime import datetime
 from typing import Optional
 
 import googleapiclient.discovery
 from google.oauth2.credentials import Credentials
 
 from . import oauth
-from .type_hints import LiveBroadcast
+from .type_hints import LiveBroadcast, PrivacyStatus
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ class YouTube:
     YouTube-API main class
     """
     credentials: Credentials
-    service: googleapiclient.discovery.Resource
+    _service: googleapiclient.discovery.Resource
 
     def __init__(self):
         log.info('Initializing YouTube API…')
@@ -25,7 +26,8 @@ class YouTube:
             self.credentials = oauth.authorize()
 
         # Create client
-        self.service = googleapiclient.discovery.build('youtube', 'v3', credentials=self.credentials)
+        self._service = googleapiclient.discovery.build('youtube', 'v3', credentials=self.credentials)
+        self._live_broadcasts = self._service.liveBroadcasts()
 
         log.info('YouTube ready.')
 
@@ -36,12 +38,11 @@ class YouTube:
         """
         Return all scheduled and active broadcasts
         """
-        live_broadcasts = self.service.liveBroadcasts()
         # Get upcoming and active broadcasts
-        upcoming_response = live_broadcasts.list(part='id,snippet,contentDetails,status', maxResults=50,
-                                                 broadcastStatus='upcoming').execute()
-        active_response = live_broadcasts.list(part='id,snippet,contentDetails,status', maxResults=50,
-                                               broadcastStatus='active').execute()
+        upcoming_response = self._live_broadcasts.list(part='id,snippet,contentDetails,status', maxResults=50,
+                                                       broadcastStatus='upcoming').execute()
+        active_response = self._live_broadcasts.list(part='id,snippet,contentDetails,status', maxResults=50,
+                                                     broadcastStatus='active').execute()
         return upcoming_response['items'] + active_response['items']
 
     def get_broadcast_with_id(self, br_id: str) -> Optional[LiveBroadcast]:
@@ -50,9 +51,30 @@ class YouTube:
         :param br_id: The ID of the broadcast to retrieve
         :return: The broadcast, or None, if it wasn't found
         """
-        live_broadcasts = self.service.liveBroadcasts()
+        live_broadcasts = self._service.liveBroadcasts()
         result = live_broadcasts.list(id=br_id)
         try:
             return result['items'][0]
         except KeyError | IndexError:
             return None
+
+    def create_broadcast(self, title: str, start: datetime, privacy: PrivacyStatus) -> LiveBroadcast:
+        """
+        Create a new `LiveBroadcast` and return it
+        :return: the newly created LiveBroadcast resource
+        """
+        if len(title) > 100:
+            raise ValueError('Title may not be longer than 100 characters')
+        if '<' in title or '>' in title:
+            raise ValueError('Title may not contain "<" or ">"')
+
+        result = self._live_broadcasts.insert(part='id,snippet,contentDetails,status', body={
+            'snippet': {
+                'title': title,
+                'scheduledStartTime': start.astimezone(tz=None).isoformat(),
+            },
+            'status': {
+                'privacyStatus': privacy
+            }
+        }).execute()
+        return result

@@ -7,8 +7,9 @@ from dataclasses import dataclass
 from typing import Optional
 
 from ct.CtEvent import CtEvent
-from ct.Facts import ManageStreamBehavior
+from ct.Facts import ManageStreamBehavior, YtVisibility
 from yt.type_hints import LiveBroadcast
+from yt.type_hints import PrivacyStatus
 
 
 @dataclass
@@ -45,6 +46,17 @@ class Event(CtEvent):
             if _is_video_id(match):
                 return match
         return None
+
+    @property
+    def yt_visibility(self) -> PrivacyStatus:
+        """Parse the visibility fact from ChurchTools into a privacy status for YouTube"""
+        match self.facts.visibility:
+            case YtVisibility.VISIBLE:
+                return 'public'
+            case YtVisibility.UNLISTED:
+                return 'unlisted'
+            case _:
+                return 'private'
 
 
 def _is_video_id(match: str):

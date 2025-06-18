@@ -128,7 +128,10 @@ class ChurchTools:
         :param link: The link to be set
         :return True, if successful
         """
-        r = self._do_post(f'/files/service/{event.id}/link', {'name': 'YouTube-Stream', 'url': link})
+        r = self._do_post(f'/files/service/{event.id}/link', {
+            'name': config.churchtools['stream_attachment_name'],
+            'url': link
+        })
 
         if r.status_code != 201:
             log.error(f'Error when setting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
