@@ -1,7 +1,5 @@
 {
   "churchtools": {
-    "instance": "churchtools.test",
-    "token": "API_TOKEN_HERE",
     "days_to_load": 7,
     "manage_stream_behavior_fact": {
       "name": "Livestream",

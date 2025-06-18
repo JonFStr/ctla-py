@@ -88,7 +88,7 @@ def _load_env_config() -> Config:
     :return: The config dict
     """
     # noinspection PyTypeChecker
-    raw_values: Config = {
+    raw_values: Config = {  # TODO document configurable values
         'churchtools': {
             'instance': os.getenv('CTLA_CT_INSTANCE'),
             'token': os.getenv('CTLA_CT_TOKEN'),

@@ -23,18 +23,23 @@ class ChurchTools:
     token: str
     _facts_cache: dict[int, str] = None
 
-    @classmethod
-    def create(cls):
-        """Helper method to create object with default configuration parameters"""
-        return cls(config.churchtools['instance'], config.churchtools['token'])
-
-    def __init__(self, instance: str, token: str):
+    def __init__(self, instance: str = None, token: str = None):
         """
         Construct a new ChurchTools-Api instance.
 
         :param instance: The hostname of the instance
         :param token: The API Token of the user
         """
+        try:
+            if not instance:
+                instance = config.churchtools['instance']
+            if not token:
+                token = config.churchtools['token']
+        except KeyError:
+            log.critical('Please configure Your ChurchTools instance and API token in the config'
+                         'or via environment variables')
+            exit(1)
+
         self.urlbase = urllib.parse.urlunsplit(('https', instance, '/api', '', ''))
         self.token = token
 
