@@ -7,9 +7,9 @@ from typing import Any
 
 import requests
 
-import configs
 from .Event import Event
 from .EventFile import EventFile, EventFileType
+from .. import configs
 
 log = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class ChurchTools:
         Load and return events from ChurchTools
         :param days: How many days to load in advance (including the current day)
         :return: A generator creating the events
-        :raises HttpError (directly passed down from the requests module) if an error occurred
+        :raise HttpError (directly passed down from the requests module) if an error occurred
         """
         # Compute date instance for filter end date
         from_limit = datetime.date.today().isoformat()

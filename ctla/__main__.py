@@ -1,12 +1,14 @@
 import logging
-import pprint
 
 import configs
 from configs import args
 from ct import ChurchTools
-from yt.YouTube import YouTube
+from yt import YouTube
+
+logging.basicConfig(level=logging.DEBUG)
 
 args.parse()
 configs.load()
 
-logging.basicConfig(level=logging.DEBUG)
+ct = ChurchTools.create()
+yt = YouTube()

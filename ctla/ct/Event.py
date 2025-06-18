@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-import configs
 from .EventFile import EventFile
 from .Facts import Facts
+from .. import configs
 
 
 @dataclass

@@ -3,7 +3,7 @@ import logging
 import os.path
 from typing import TypedDict
 
-from configs import args
+from . import args
 from .churchtools import ChurchToolsConf
 from .youtube import YouTubeConf
 
