@@ -8,7 +8,7 @@ from typing import Any
 import requests
 
 import config
-from .Event import Event
+from .CtEvent import CtEvent
 from .EventFile import EventFile, EventFileType
 
 log = logging.getLogger(__name__)
@@ -100,7 +100,7 @@ class ChurchTools:
 
         return {self._facts_cache[fact['factId']]: fact['value'] for fact in r.json()['data']}
 
-    def get_upcoming_events(self, days: int) -> Generator[Event]:
+    def get_upcoming_events(self, days: int) -> Generator[CtEvent]:
         """
         Load and return events from ChurchTools
         :param days: How many days to load in advance (including the current day)
@@ -119,9 +119,9 @@ class ChurchTools:
         for event in r.json()['data']:
             facts = self.get_event_facts(event['id'])
             # noinspection PyTypeChecker
-            yield Event.from_api_json(event, facts)
+            yield CtEvent.from_api_json(event, facts)
 
-    def set_stream_link(self, event: Event, link: str) -> bool:
+    def set_stream_link(self, event: CtEvent, link: str) -> bool:
         """
         Set the YT-Stream Link for an event to the given link
         :param event: The ChurchTools Event to set the link for
@@ -144,7 +144,7 @@ class ChurchTools:
         )
         return True
 
-    def delete_stream_link(self, event: Event) -> bool:
+    def delete_stream_link(self, event: CtEvent) -> bool:
         """
         Delete the Stream Link from an event
         :param event: The event to delete the stream link from

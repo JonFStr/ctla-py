@@ -9,7 +9,7 @@ from .Facts import Facts
 
 
 @dataclass
-class Event:
+class CtEvent:
     """Class holding data about an Event"""
     id: int
     category_id: int
@@ -25,7 +25,7 @@ class Event:
     yt_thumbnail: Optional[EventFile] = None
 
     @classmethod
-    def from_api_json(cls, event: dict[str, typing.Any], facts: dict[str, int | str]) -> 'Event':
+    def from_api_json(cls, event: dict[str, typing.Any], facts: dict[str, int | str]) -> 'CtEvent':
         """
         Create instance from API results
         :param event: Result from /events
