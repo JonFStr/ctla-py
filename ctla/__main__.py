@@ -1,9 +1,12 @@
 import logging
 
-import configs
-from configs import args
-from ct import ChurchTools
-from yt import YouTube
+import config
+from config import args
+from ct.ChurchTools import ChurchTools
+from ct.Event import Event
+from ct.Facts import ManageStreamBehavior
+from yt.YouTube import YouTube
+from yt.type_hints import LiveBroadcast
 
 logging.basicConfig(level=logging.DEBUG)
 

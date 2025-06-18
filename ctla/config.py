@@ -3,9 +3,9 @@ import logging
 import os.path
 from typing import TypedDict
 
-from . import args
-from .churchtools import ChurchToolsConf
-from .youtube import YouTubeConf
+from configs import args
+from configs.churchtools import ChurchToolsConf
+from configs.youtube import YouTubeConf
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ def filter_none[T: dict](target: T) -> T:
 
 
 def _load_default_config() -> Config:
-    with open(os.path.join(os.path.dirname(__file__), 'default_config.json'), 'r') as default_file:
+    with open(os.path.join(os.path.dirname(__file__), 'configs/default_config.json'), 'r') as default_file:
         return json.load(default_file)
 
 
