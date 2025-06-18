@@ -7,9 +7,9 @@ from typing import Any
 
 import requests
 
+import configs
 from .Event import Event
 from .EventFile import EventFile, EventFileType
-from .. import config
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class ChurchTools:
     @classmethod
     def create(cls):
         """Helper method to create object with default configuration parameters"""
-        return cls(config.churchtools['instance'], config.churchtools['token'])
+        return cls(configs.churchtools['instance'], configs.churchtools['token'])
 
     def __init__(self, instance: str, token: str):
         """

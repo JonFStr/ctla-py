@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+import configs
 from .EventFile import EventFile
 from .Facts import Facts
-from .. import config
 
 
 @dataclass
@@ -34,8 +34,8 @@ class Event:
         """
         # Find attached files we care about
         yt_link_data = next(
-            (f for f in event['eventFiles'] if f['title'] == config.churchtools['stream_attachment_name']), None)
-        yt_thumb_data = next((f for f in event['eventFiles'] if f['title'] == config.churchtools['thumbnail_name']),
+            (f for f in event['eventFiles'] if f['title'] == configs.churchtools['stream_attachment_name']), None)
+        yt_thumb_data = next((f for f in event['eventFiles'] if f['title'] == configs.churchtools['thumbnail_name']),
                              None)
 
         return cls(

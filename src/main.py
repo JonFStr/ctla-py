@@ -1,10 +1,12 @@
 import logging
+import pprint
 
-from . import args, config
-from .ct import ChurchTools
-from .yt.YouTube import YouTube
+import configs
+from configs import args
+from ct import ChurchTools
+from yt.YouTube import YouTube
 
 args.parse()
-config.load()
+configs.load()
 
 logging.basicConfig(level=logging.DEBUG)

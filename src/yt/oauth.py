@@ -11,7 +11,7 @@ import google_auth_oauthlib.flow
 from google.oauth2.credentials import Credentials
 from oauthlib.oauth2 import OAuth2Error
 
-from .. import config
+import configs
 
 SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 
@@ -22,7 +22,7 @@ def save_credentials(credentials):
 
     :param credentials: The credentials to save
     """
-    cred_path = config.youtube['credentials_file']
+    cred_path = configs.youtube['credentials_file']
     with open(cred_path, 'w') as cred_file:
         # noinspection PyTypeChecker
         json.dump({'token': credentials.token,
@@ -40,7 +40,7 @@ def load_credentials() -> Credentials | None:
 
     :return: The loaded credentials, or None, if none were found.
     """
-    cred_path = config.youtube['credentials_file']
+    cred_path = configs.youtube['credentials_file']
     if os.path.exists(cred_path):
         with open(cred_path, 'r') as cred_file:
             return Credentials(**json.load(cred_file))
@@ -53,11 +53,11 @@ _oauth_success = False
 
 def _get_oauth_flow(state=None):
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        config.youtube['client_secrets_file'],
+        configs.youtube['client_secrets_file'],
         scopes=SCOPES,
         state=state
     )
-    flow.redirect_uri = config.youtube['redirect_url']
+    flow.redirect_uri = configs.youtube['redirect_url']
     return flow
 
 
@@ -132,7 +132,7 @@ def authorize() -> Credentials:
           f'Open the following URL in your browser: {authorization_url}')
 
     # Start server for listening for OAuth redirects
-    server_address = ('', config.youtube['redirect_port'])
+    server_address = ('', configs.youtube['redirect_port'])
     # noinspection PyTypeChecker
     with HTTPServer(server_address, OAuthHTTPRequestHandler) as httpd:
         print(f'Now listening on port {server_address[1]} for authorization result…')
