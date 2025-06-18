@@ -14,7 +14,7 @@ from yt.type_hints import LiveBroadcast
 log = logging.getLogger(__name__)
 
 
-def get_relevant_events(ct: ChurchTools, yt: YouTube) -> Generator[Event]:
+def gather_event_info(ct: ChurchTools, yt: YouTube) -> Generator[Event]:
     """
     Fetch and return all events to act upon.
 
@@ -34,12 +34,13 @@ def get_relevant_events(ct: ChurchTools, yt: YouTube) -> Generator[Event]:
             log.info(f'Skipping event {event}, as it is ignored.')
             continue
 
-        attach_youtube_broadcast(event, yt, yt_broadcasts)
+        if attach_youtube_broadcast(event, yt, yt_broadcasts):
+            log.debug(f'Attached YouTube broadcast to {event}')
 
         yield event
 
 
-def attach_youtube_broadcast(event: Event, yt: YouTube, broadcasts: list[LiveBroadcast]):
+def attach_youtube_broadcast(event: Event, yt: YouTube, broadcasts: list[LiveBroadcast]) -> bool:
     """
     Try to find a matching broadcast in the given list of available broadcasts
 
@@ -48,22 +49,21 @@ def attach_youtube_broadcast(event: Event, yt: YouTube, broadcasts: list[LiveBro
     :param broadcasts: Pre-fetched active and upcoming broadcasts
     :return: True, if a broadcast was found and attached
     """
-    # Needs to have a
-    if not event.yt_link:
-        return
-
     # Check if a broadcast was ever attached
     vid_id = event.youtube_video_id
     if not vid_id:
-        return
+        return False
 
     # Try to find the broadcast in upcoming and active broadcasts
     for bc in broadcasts:
         if bc['id'] == vid_id:
             event.yt_broadcast = bc
-            return
+            return True
 
     # Not found, try to find it in completed broadcasts
     bc = yt.get_broadcast_with_id(vid_id)
     if bc:
         event.yt_broadcast = bc
+        return True
+
+    return False

@@ -34,6 +34,9 @@ class Event(CtEvent):
 
         This does not support embed URLs (/embed/…), the mobile site (m.youtube.com/…) or nocookie sites.
         """
+        if not self.yt_link:
+            return None
+
         query = urllib.parse.urlparse(self.yt_link.url)
         if query.hostname == 'youtu.be':
             return query.path[1:]  # youtu.be-Links have the ID as path
