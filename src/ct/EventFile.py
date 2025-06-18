@@ -19,7 +19,7 @@ class EventFile:
     url: str
 
     @classmethod
-    def from_event_api_json(cls, file_data: dict[str | Any]):
+    def from_event_api_json(cls, file_data: dict[str, Any]):
         """Create instance from API results at /api/events/…"""
         return cls(
             id=file_data['domainIdentifier'],
@@ -29,7 +29,7 @@ class EventFile:
         )
 
     @classmethod
-    def from_file_api_json(cls, file_data: dict[str | Any]):
+    def from_file_api_json(cls, file_data: dict[str, Any]):
         """Create instance from API results at /api/files/…"""
         return cls(
             id=file_data['id'],

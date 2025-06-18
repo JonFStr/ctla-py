@@ -10,7 +10,7 @@
       "default": "No"
     },
     "stream_visibility_fact": {
-      "name": "Livestream Visibilty",
+      "name": "Livestream Visibility",
       "visible_value": "Public",
       "unlisted_value": "Only via a link",
       "private_value": "Private",

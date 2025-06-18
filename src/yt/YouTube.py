@@ -1,7 +1,11 @@
+import logging
+
 import googleapiclient.discovery
 from google.oauth2.credentials import Credentials
 
 from . import oauth
+
+log = logging.getLogger(__name__)
 
 
 class YouTube:
@@ -12,7 +16,7 @@ class YouTube:
     service: googleapiclient.discovery.Resource
 
     def __init__(self):
-        print('Initializing YouTube API…')
+        log.info('Initializing YouTube API…')
         # Obtain Credentials
         self.credentials = oauth.load_credentials()
         if self.credentials is None:
@@ -21,7 +25,7 @@ class YouTube:
         # Create client
         self.service = googleapiclient.discovery.build('youtube', 'v3', credentials=self.credentials)
 
-        print('YouTube ready.')
+        log.info('YouTube ready.')
 
     def close(self):
         oauth.save_credentials(self.credentials)

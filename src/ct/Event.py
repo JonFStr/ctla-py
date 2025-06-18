@@ -1,6 +1,7 @@
 import typing
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 from .EventFile import EventFile
 from .Facts import Facts
@@ -20,8 +21,8 @@ class Event:
 
     facts: Facts
 
-    yt_link: EventFile | None = None
-    yt_thumbnail: EventFile | None = None
+    yt_link: Optional[EventFile] = None
+    yt_thumbnail: Optional[EventFile] = None
 
     @classmethod
     def from_api_json(cls, event: dict[str, typing.Any], facts: dict[str, int | str]) -> 'Event':

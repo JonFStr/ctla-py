@@ -1,7 +1,10 @@
 """
 Parse CLI arguments and hold them accessible for the application
 """
+import logging
 from argparse import ArgumentParser, Namespace, FileType
+
+log = logging.getLogger(__name__)
 
 # parsed arguments
 parsed: Namespace
@@ -34,4 +37,4 @@ def parse():
     parser = _setup_parser()
     parsed = parser.parse_args()
 
-    print('Application initialized.')
+    log.info('Application initialized.')

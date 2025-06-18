@@ -69,7 +69,7 @@ class ShowOnHomepageConf(TypedDict):
 
 class ChurchToolsConf(TypedDict):
     """
-    Datatclass holding configuration about ChurchTools
+    Dataclass holding configuration about ChurchTools
 
     Attributes:
 

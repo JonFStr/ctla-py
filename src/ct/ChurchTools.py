@@ -1,8 +1,8 @@
 import datetime
+import logging
 import urllib.parse
 from collections.abc import Generator
 from datetime import timedelta
-from sys import stderr
 from typing import Any
 
 import requests
@@ -10,6 +10,8 @@ import requests
 from .Event import Event
 from .EventFile import EventFile, EventFileType
 from .. import config
+
+log = logging.getLogger(__name__)
 
 
 class ChurchTools:
@@ -36,7 +38,7 @@ class ChurchTools:
         self.urlbase = urllib.parse.urlunsplit(('https', instance, '/api', '', ''))
         self.token = token
 
-        print('Initialized ChurchTools API.')
+        log.info('Initialized ChurchTools API.')
 
     @property
     def __headers(self):
@@ -51,6 +53,7 @@ class ChurchTools:
         :return: The `requests`-library's Response-object.
         """
         url = self.urlbase + path
+        log.debug(f'Perform GET request to {url} (parameters: {kwargs})')
         return requests.get(url, params=kwargs, headers=self.__headers)
 
     def _do_post(self, path: str, json: dict[str, Any]):
@@ -62,6 +65,7 @@ class ChurchTools:
         :return: The `requests`-library's Response-object.
         """
         url = self.urlbase + path
+        log.debug(f'Perform POST request to {url} (data: {json})')
         return requests.post(url, json=json, headers=self.__headers)
 
     def _do_delete(self, path: str):
@@ -72,6 +76,7 @@ class ChurchTools:
         :return: The `requests`-library's Response-object.
         """
         url = self.urlbase + path
+        log.debug(f'Perform DELETE request to {url}')
         return requests.delete(url, headers=self.__headers)
 
     def cache_facts(self):
@@ -80,7 +85,7 @@ class ChurchTools:
             return
         r = self._do_get('/facts')
         if r.status_code != 200:
-            print(f'Response error when fetching fact masterdata [{r.status_code}]: "{r.content}"', file=stderr)
+            log.error(f'Response error when fetching fact masterdata [{r.status_code}]: "{r.content}"')
 
         self._facts_cache = {fact['id']: fact['name'] for fact in r.json()['data']}
 
@@ -90,16 +95,17 @@ class ChurchTools:
 
         r = self._do_get(f'/events/{event_id}/facts')
         if r.status_code != 200:
-            print(f'Response error when fetching facts for {event_id} [{r.status_code}]: "{r.content}"', file=stderr)
+            log.error(f'Response error when fetching facts for {event_id} [{r.status_code}]: "{r.content}"')
             return None
 
         return {self._facts_cache[fact['factId']]: fact['value'] for fact in r.json()['data']}
 
-    def get_upcoming_events(self, days: int) -> Generator[Event] | None:
+    def get_upcoming_events(self, days: int) -> Generator[Event]:
         """
         Load and return events from ChurchTools
         :param days: How many days to load in advance (including the current day)
-        :return: A list of Events, or None, when an error occurred
+        :return: A generator creating the events
+        :raises HttpError (directly passed down from the requests module) if an error occurred
         """
         # Compute date instance for filter end date
         from_limit = datetime.date.today().isoformat()
@@ -107,8 +113,8 @@ class ChurchTools:
 
         r = self._do_get('/events', canceled=True, **{'from': from_limit}, to=to_limit)
         if r.status_code != 200:
-            print(f'Response error when fetching upcoming events [{r.status_code}]: "{r.content}"', file=stderr)
-            return None
+            log.error(f'Response error when fetching upcoming events [{r.status_code}]: "{r.content}"')
+            r.raise_for_status()
 
         for event in r.json()['data']:
             facts = self.get_event_facts(event['id'])
@@ -125,7 +131,7 @@ class ChurchTools:
         r = self._do_post(f'/files/service/{event.id}/link', {'name': 'YouTube-Stream', 'url': link})
 
         if r.status_code != 201:
-            print(f'Error when setting stream link on ChurchTools [{r.status_code}]: "{r.content}"', file=stderr)
+            log.error(f'Error when setting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
             return False
 
         # Write new link into Event object
@@ -146,6 +152,6 @@ class ChurchTools:
         """
         r = self._do_delete(f'/files/{event.yt_link.id}')
         if r.status_code != 204:
-            print(f'Error when deleting stream link on ChurchTools [{r.status_code}]: "{r.content}"', file=stderr)
+            log.error(f'Error when deleting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
             return False
         return True

@@ -1,10 +1,13 @@
 import json
+import logging
 import os.path
 from typing import TypedDict
 
 from . import args
 from .configs.churchtools import ChurchToolsConf
 from .configs.youtube import YouTubeConf
+
+log = logging.getLogger(__name__)
 
 
 class Config(TypedDict):
@@ -149,4 +152,4 @@ def load():
     youtube = config['youtube']
     wordpress = config['wordpress']
 
-    print('Configuration loaded.')
+    log.info('Configuration loaded.')
