@@ -154,3 +154,16 @@ class YouTube:
         result = self._live_broadcasts.update(part=','.join(parts_to_update), body=body).execute()
         utils.combine_into(result, broadcast)
         return broadcast
+
+    def bind_stream_to_broadcast(self, br_id: str, stream_id: Optional[str] = None) -> LiveBroadcast:
+        """
+        Bind a stream to the broadcast
+
+        :param br_id: The ID (YouTube Video ID) of the broadcast to update
+        :param stream_id: The ID of the stream to attach to the broadcast
+        :return: The updated LiveBroadcast resource
+        """
+        if not stream_id:
+            stream_id = config.youtube['stream_key_id']
+        result = self._live_broadcasts.bind(id=br_id, part=DEFAULT_PART, streamId=stream_id).execute()
+        return result
