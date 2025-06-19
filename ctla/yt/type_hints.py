@@ -13,6 +13,8 @@ class BroadcastSnippet(TypedDict):
     publishedAt: str
     title: str
     description: str
+    scheduledStartTime: str
+    scheduledEndTime: str
 
 
 class BroadcastStatus(TypedDict):

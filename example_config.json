@@ -35,7 +35,18 @@
     "redirect_port": 8080,
     "client_secrets_file": "client_secrets.json",
     "credentials_file": "youtube_credentials.json",
-    "stream_key_id": "STREAM_KEY_ID_HERE"
+    "stream_key_id": "STREAM_KEY_ID_HERE",
+    "broadcast_settings": {
+      "enable_monitor_stream": true,
+      "broadcast_stream_delay_ms": 0,
+      "enable_embed": true,
+      "enable_dvr": true,
+      "record_from_start": true,
+      "closed_captions_type": "closedCaptionsDisabled",
+      "latency_preference": "low",
+      "enable_auto_start": false,
+      "enable_auto_stop": false
+    }
   },
   "wordpress": {}
 }
