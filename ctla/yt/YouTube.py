@@ -5,6 +5,7 @@ from typing import Optional
 import googleapiclient.discovery
 from google.oauth2.credentials import Credentials
 
+import config
 from . import oauth
 from .type_hints import LiveBroadcast, PrivacyStatus
 
@@ -29,7 +30,23 @@ class YouTube:
         self._service = googleapiclient.discovery.build('youtube', 'v3', credentials=self.credentials)
         self._live_broadcasts = self._service.liveBroadcasts()
 
+        self.check_stream_key_configured()
+
         log.info('YouTube ready.')
+
+    def check_stream_key_configured(self):
+        try:
+            if config.youtube['stream_key_id'] == 'STREAM_KEY_ID_HERE':
+                raise ValueError
+        except (KeyError, ValueError):
+            result = self._service.liveStreams().list(part='snippet', mine=True, maxResults=50).execute()
+            log.critical(
+                'No stream key ID has been set. '
+                'Please choose a stream key from the list below and add its ID to Your configuration file:\n'
+                'ID:' + ' ' * 39 + 'Name:\n' +
+                '\n'.join(f'{sk['id']}    "{sk['snippet']['title']}"' for sk in result['items'])
+            )
+            exit(1)
 
     def close(self):
         oauth.save_credentials(self.credentials)

@@ -35,7 +35,10 @@ class ChurchTools:
                 instance = config.churchtools['instance']
             if not token:
                 token = config.churchtools['token']
-        except KeyError:
+
+            if instance == 'churchtools.test' or token == 'API_TOKEN_HERE':
+                raise ValueError
+        except (KeyError, ValueError):
             log.critical('Please configure Your ChurchTools instance and API token in the config'
                          'or via environment variables')
             exit(1)
