@@ -1,15 +1,18 @@
 import logging
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
 import googleapiclient.discovery
 from google.oauth2.credentials import Credentials
 
 import config
+import utils
 from . import oauth
 from .type_hints import LiveBroadcast, PrivacyStatus
 
 log = logging.getLogger(__name__)
+
+DEFAULT_PART = 'id,snippet,contentDetails,status'  # Default value for 'part' parameter in requests
 
 
 class YouTube:
@@ -56,9 +59,9 @@ class YouTube:
         Return all scheduled and active broadcasts
         """
         # Get upcoming and active broadcasts
-        upcoming_response = self._live_broadcasts.list(part='id,snippet,contentDetails,status', maxResults=50,
+        upcoming_response = self._live_broadcasts.list(part=DEFAULT_PART, maxResults=50,
                                                        broadcastStatus='upcoming').execute()
-        active_response = self._live_broadcasts.list(part='id,snippet,contentDetails,status', maxResults=50,
+        active_response = self._live_broadcasts.list(part=DEFAULT_PART, maxResults=50,
                                                      broadcastStatus='active').execute()
         return upcoming_response['items'] + active_response['items']
 
@@ -76,22 +79,40 @@ class YouTube:
             return None
 
     def create_broadcast(self, title: str, start: datetime, privacy: PrivacyStatus) -> LiveBroadcast:
+        # noinspection GrazieInspection
         """
-        Create a new `LiveBroadcast` and return it
-        :return: the newly created LiveBroadcast resource
-        """
+                Create a new `LiveBroadcast` and return it.
+
+                This applies the configuration from "youtube.broadcast_settings" in the config file
+                :return: the newly created LiveBroadcast resource
+                """
         if len(title) > 100:
             raise ValueError('Title may not be longer than 100 characters')
         if '<' in title or '>' in title:
             raise ValueError('Title may not contain "<" or ">"')
 
-        result = self._live_broadcasts.insert(part='id,snippet,contentDetails,status', body={
+        broadcast_settings = config.youtube['broadcast_settings']
+
+        result = self._live_broadcasts.insert(part=DEFAULT_PART, body={
             'snippet': {
                 'title': title,
-                'scheduledStartTime': start.astimezone(tz=None).isoformat(),
+                'scheduledStartTime': start.astimezone(None).isoformat(),
             },
             'status': {
                 'privacyStatus': privacy
+            },
+            'contentDetails': {
+                'monitorStream': {
+                    'enableMonitorStream': broadcast_settings['enable_monitor_stream'],
+                    'broadcastStreamDelayMs': broadcast_settings['broadcast_stream_delay_ms']
+                },
+                'enableEmbed': broadcast_settings['enable_embed'],
+                'enableDvr': broadcast_settings['enable_dvr'],
+                'recordFromStart': broadcast_settings['record_from_start'],
+                'closedCaptionsType': broadcast_settings['closed_captions_type'],
+                'latencyPreference': broadcast_settings['latency_preference'],
+                'enableAutoStart': broadcast_settings['enable_auto_start'],
+                'enableAutoStop': broadcast_settings['enable_auto_stop'],
             }
         }).execute()
         return result
