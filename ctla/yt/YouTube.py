@@ -116,3 +116,41 @@ class YouTube:
             }
         }).execute()
         return result
+
+    def set_broadcast_info(self, broadcast: LiveBroadcast, title: str = None, desc: str = None, start: datetime = None,
+                           end: datetime = None, privacy: PrivacyStatus = None) -> LiveBroadcast:
+        """
+        Update the broadcast information with the one given.
+        Optional parameters may be omitted, in which case they won't be updated
+
+        :param broadcast: The ID of the broadcast to update
+        :param title: The title to set. Must be at most 100 characters long and may not contain '<' or '>'
+        :param desc: The description of the broadcast. Restrictions like for title, but 5000 bytes in length
+        :param start: The scheduled time
+        :param end: The scheduled end time
+        :param privacy: The visibility of the broadcast
+        :return: The updated LiveBroadcast resource. This property will have been merged with the passed `broadcast`,
+            since not all parts are updated in this request
+            (at least all 'contentDetails' settings always remain untouched)
+        """
+        parts_to_update = {'id'}
+        body: dict[str, Any] = {'id': broadcast['id']}
+        # Insert defined parameters into `body`
+        if title or desc or start or end:
+            parts_to_update.add('snippet')
+            body['snippet'] = {
+                'title': title if title else broadcast['snippet']['title'],
+                'description': desc if desc else broadcast['snippet']['description'],
+                'scheduledStartTime': start.astimezone(None).isoformat() if start else broadcast['snippet'][
+                    'scheduledStartTime'],
+                'scheduledEndTime': end.astimezone(None).isoformat() if end else broadcast['snippet'][
+                    'scheduledEndTime']
+            }
+
+        if privacy:
+            parts_to_update.add('status')
+            body['status'] = {'privacyStatus': privacy}
+
+        result = self._live_broadcasts.update(part=','.join(parts_to_update), body=body).execute()
+        utils.combine_into(result, broadcast)
+        return broadcast
