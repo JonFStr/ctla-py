@@ -15,6 +15,7 @@ class BroadcastSnippet(TypedDict):
     description: str
     scheduledStartTime: str
     scheduledEndTime: str
+    thumbnails: dict
 
 
 class BroadcastStatus(TypedDict):

@@ -36,6 +36,7 @@
     "client_secrets_file": "client_secrets.json",
     "credentials_file": "youtube_credentials.json",
     "stream_key_id": "STREAM_KEY_ID_HERE",
+    "thumbnail_uri": "https://http.cat/404.jpg",
     "broadcast_settings": {
       "enable_monitor_stream": true,
       "broadcast_stream_delay_ms": 0,

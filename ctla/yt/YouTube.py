@@ -1,9 +1,15 @@
 import logging
+import os
+import urllib.parse
+import urllib.request
 from datetime import datetime
+from http.client import HTTPResponse
+from pathlib import Path
 from typing import Optional, Any
 
 import googleapiclient.discovery
 from google.oauth2.credentials import Credentials
+from googleapiclient.http import MediaIoBaseUpload, MediaFileUpload
 
 import config
 import utils
@@ -167,3 +173,24 @@ class YouTube:
             stream_id = config.youtube['stream_key_id']
         result = self._live_broadcasts.bind(id=br_id, part=DEFAULT_PART, streamId=stream_id).execute()
         return result
+
+    def set_thumbnails(self, broadcast: LiveBroadcast, thumbnail_uri: str) -> LiveBroadcast:
+        """
+        Set the thumbnail of a broadcast
+        :param broadcast: The broadcast to update
+        :param thumbnail_uri: The URI to the thumbnail.
+            If the scheme is 'file://' or unset, load the file at the specified path, otherwise treat as http URL
+        :return: The updated LiveBroadcast resource
+        """
+        parsed_uri = urllib.parse.urlparse(thumbnail_uri)
+        if parsed_uri.scheme == '' and Path(thumbnail_uri).exists():
+            media_upload = MediaFileUpload(thumbnail_uri)
+        elif parsed_uri.scheme == 'file':
+            media_upload = MediaFileUpload(urllib.parse.unquote_plus(os.path.join(parsed_uri.netloc + parsed_uri.path)))
+        else:
+            response: HTTPResponse = urllib.request.urlopen(thumbnail_uri)
+            media_upload = MediaIoBaseUpload(response, response.headers.get_content_type())
+
+        result = self._service.thumbnails().set(videoId=broadcast['id'], media_body=media_upload).execute()
+        broadcast['snippet']['thumbnails'] = result['items'][0]
+        return broadcast
