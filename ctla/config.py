@@ -3,6 +3,7 @@ import logging
 import os.path
 from typing import TypedDict
 
+import utils
 from configs import args
 from configs.churchtools import ChurchToolsConf
 from configs.youtube import YouTubeConf
@@ -25,19 +26,6 @@ youtube: YouTubeConf
 wordpress: None
 # noinspection PyTypeChecker
 churchtools, youtube, wordpress = {}, {}, {}
-
-
-def combine_into(delta: dict, combined: dict) -> None:
-    """
-    Recursively combine dictionaries together, with `delta` taking priority in choosing the value for non-dict entries.
-
-    Stolen from https://stackoverflow.com/a/70310511
-    """
-    for k, v in delta.items():
-        if isinstance(v, dict):
-            combine_into(v, combined.setdefault(k, {}))
-        else:
-            combined[k] = v
 
 
 def filter_none[T: dict](target: T) -> T:
@@ -135,17 +123,17 @@ def load():
     config: Config = dict()
 
     # Load default config
-    combine_into(_load_default_config(), config)
+    utils.combine_into(_load_default_config(), config)
 
     # Load user-given config
-    combine_into(_load_user_config(), config)
+    utils.combine_into(_load_user_config(), config)
 
     # Load ENV parameters
     envc = _load_env_config()
-    combine_into(envc, config)
+    utils.combine_into(envc, config)
 
     # Load CLI parameters
-    combine_into(_load_cli_params(), config)
+    utils.combine_into(_load_cli_params(), config)
 
     global churchtools, youtube, wordpress
     churchtools = config['churchtools']
