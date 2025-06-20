@@ -1,5 +1,8 @@
 import logging
+import mimetypes
 import os
+import shutil
+import tempfile
 import urllib.parse
 import urllib.request
 from datetime import datetime
@@ -9,7 +12,7 @@ from typing import Optional, Any
 
 import googleapiclient.discovery
 from google.oauth2.credentials import Credentials
-from googleapiclient.http import MediaIoBaseUpload, MediaFileUpload
+from googleapiclient.http import MediaIoBaseUpload
 
 import config
 import utils
@@ -184,13 +187,20 @@ class YouTube:
         """
         parsed_uri = urllib.parse.urlparse(thumbnail_uri)
         if parsed_uri.scheme == '' and Path(thumbnail_uri).exists():
-            media_upload = MediaFileUpload(thumbnail_uri)
+            file = open(thumbnail_uri, 'rb')
+            mime = mimetypes.guess_file_type(thumbnail_uri)[0]
         elif parsed_uri.scheme == 'file':
-            media_upload = MediaFileUpload(urllib.parse.unquote_plus(os.path.join(parsed_uri.netloc + parsed_uri.path)))
+            path = urllib.parse.unquote_plus(os.path.join(parsed_uri.netloc + parsed_uri.path))
+            file = open(path, 'rb')
+            mime = mimetypes.guess_file_type(path)[0]
         else:
             response: HTTPResponse = urllib.request.urlopen(thumbnail_uri)
-            media_upload = MediaIoBaseUpload(response, response.headers.get_content_type())
+            file = tempfile.TemporaryFile()
+            mime = response.headers.get_content_type()
+            shutil.copyfileobj(response, file)
 
-        result = self._service.thumbnails().set(videoId=broadcast['id'], media_body=media_upload).execute()
+        with file as fd:
+            media_upload = MediaIoBaseUpload(fd, mime)
+            result = self._service.thumbnails().set(videoId=broadcast['id'], media_body=media_upload).execute()
         broadcast['snippet']['thumbnails'] = result['items'][0]
         return broadcast
