@@ -60,6 +60,8 @@ class YouTubeConf(TypedDict):
     - `client_secrets_file`: Path to the file containing the Google API client secret
     - `credentials_file`: Path where the app stores the API Tokens received from Google
     - `templates`: Template configuration for YouTube title / description
+    - `thumbnail_uri`: URI to a default thumbnail to be set on all new streams.
+      Can be a path to a file, a `file://`-URI or web address
     - `stream_key_id`: The identifier of the stream key to use (not the key itself!)
     - `broadcast_settings`: Setting to apply to newly created broadcasts
     """
@@ -68,5 +70,6 @@ class YouTubeConf(TypedDict):
     client_secrets_file: str
     credentials_file: str
     templates: YouTubeTemplateConf
+    thumbnail_uri: str
     stream_key_id: str
     broadcast_settings: YouTubeBroadcastSettingsConf
