@@ -4,8 +4,10 @@ Dataclasses that combine information from different sources
 import string
 import urllib.parse
 from dataclasses import dataclass
+from string import Template
 from typing import Optional
 
+import config
 from ct.CtEvent import CtEvent
 from ct.Facts import ManageStreamBehavior, YtVisibility
 from yt.type_hints import LiveBroadcast
@@ -57,6 +59,36 @@ class Event(CtEvent):
                 return 'unlisted'
             case _:
                 return 'private'
+
+    @property
+    def formatted_start(self) -> str:
+        """Start datetime, formatted according to config.youtube.templates.dateformat"""
+        return self.start_time.strftime(config.youtube['templates']['dateformat'])
+
+    @property
+    def formatted_end(self) -> str:
+        """End datetime, formatted according to config.youtube.templates.dateformat"""
+        return self.end_time.strftime(config.youtube['templates']['dateformat'])
+
+    @property
+    def yt_title(self) -> str:
+        """Apply the YouTube title template configured"""
+        return Template(config.youtube['templates']['title']).safe_substitute(**self._substitution_vars)
+
+    @property
+    def yt_description(self) -> str:
+        """Apply the YouTube description template configured"""
+        return Template(config.youtube['templates']['description']).safe_substitute(**self._substitution_vars)
+
+    @property
+    def _substitution_vars(self) -> dict[str, str]:
+        """Pack the variables available in templates into one dict"""
+        return dict(
+            title=self.title,
+            description=self.description,
+            start=self.formatted_start,
+            end=self.formatted_end
+        )
 
 
 def _is_video_id(match: str):

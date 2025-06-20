@@ -40,7 +40,7 @@ class CtEvent:
 
         return cls(
             id=event['id'],
-            category_id=event['calendar']['domainIdentifier'],
+            category_id=int(event['calendar']['domainIdentifier']),
             start_time=datetime.fromisoformat(event['startDate']),
             end_time=datetime.fromisoformat(event['endDate']),
             title=event['name'],

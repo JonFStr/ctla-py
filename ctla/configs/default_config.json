@@ -22,6 +22,11 @@
     "redirect_port": 8080,
     "client_secrets_file": "client_secrets.json",
     "credentials_file": "youtube_credentials.json",
+    "templates": {
+      "title": "${title} on ${start}",
+      "description": "Livestream from our church",
+      "dateformat": "%d.%m.%Y"
+    },
     "broadcast_settings": {
       "enable_monitor_stream": true,
       "broadcast_stream_delay_ms": 0,

@@ -1,6 +1,27 @@
 from typing import TypedDict, Literal
 
 
+class YouTubeTemplateConf(TypedDict):
+    """
+    Dataclass holding templates for YouTube information.
+
+    The templates use ${}-substitutions. Valid substitutions are:
+    - title
+    - description
+    - start (formatted with `dateformat`)
+    - end (formatted with `dateformat`)
+
+    Attributes:
+
+    - `title`: Template for the title
+    - `description`: Template for the broadcast description
+    - `dateformat`: Template understood by `datetime.strftime()`, used to format dates
+    """
+    title: str
+    description: str
+    dateformat: str
+
+
 class YouTubeBroadcastSettingsConf(TypedDict):
     """
     Dataclass holding technical settings for broadcasts
@@ -38,6 +59,7 @@ class YouTubeConf(TypedDict):
     - `redirect_port`: Port to listen on for OAuth redirects.
     - `client_secrets_file`: Path to the file containing the Google API client secret
     - `credentials_file`: Path where the app stores the API Tokens received from Google
+    - `templates`: Template configuration for YouTube title / description
     - `stream_key_id`: The identifier of the stream key to use (not the key itself!)
     - `broadcast_settings`: Setting to apply to newly created broadcasts
     """
@@ -45,5 +67,6 @@ class YouTubeConf(TypedDict):
     redirect_port: int
     client_secrets_file: str
     credentials_file: str
+    templates: YouTubeTemplateConf
     stream_key_id: str
     broadcast_settings: YouTubeBroadcastSettingsConf
