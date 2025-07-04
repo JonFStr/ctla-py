@@ -62,11 +62,13 @@ class YouTube:
 
     def close(self):
         oauth.save_credentials(self.credentials)
+        log.info('Saved YouTube access token.')
 
     def get_active_and_upcoming_broadcasts(self) -> list[LiveBroadcast]:
         """
         Return all scheduled and active broadcasts
         """
+        log.info('Collecting broadcasts from YouTube…')
         # Get upcoming and active broadcasts
         upcoming_response = self._live_broadcasts.list(part=DEFAULT_PART, maxResults=50,
                                                        broadcastStatus='upcoming').execute()
@@ -80,11 +82,12 @@ class YouTube:
         :param br_id: The ID of the broadcast to retrieve
         :return: The broadcast, or None, if it wasn't found
         """
+        log.info(f'Attempting to retrieve broadcast "{br_id}" from YouTube…')
         live_broadcasts = self._service.liveBroadcasts()
-        result = live_broadcasts.list(id=br_id)
+        result = live_broadcasts.list(id=br_id, part=DEFAULT_PART).execute()
         try:
             return result['items'][0]
-        except KeyError | IndexError:
+        except (KeyError, IndexError):
             return None
 
     def create_broadcast(self, title: str, start: datetime, privacy: PrivacyStatus) -> LiveBroadcast:
@@ -102,6 +105,7 @@ class YouTube:
 
         broadcast_settings = config.youtube['broadcast_settings']
 
+        log.info(f'Creating new broadcast "{title}"…')
         result = self._live_broadcasts.insert(part=DEFAULT_PART, body={
             'snippet': {
                 'title': title,
@@ -160,6 +164,8 @@ class YouTube:
             parts_to_update.add('status')
             body['status'] = {'privacyStatus': privacy}
 
+        log.info('Updating broadcast "%s"', broadcast['id'])
+        log.debug('Setting broadcast information to %s', repr(body))
         result = self._live_broadcasts.update(part=','.join(parts_to_update), body=body).execute()
         utils.combine_into(result, broadcast)
         return broadcast
@@ -174,6 +180,7 @@ class YouTube:
         """
         if not stream_id:
             stream_id = config.youtube['stream_key_id']
+        log.info(f'Binding stream "{stream_id}" to broadcast {br_id}')
         result = self._live_broadcasts.bind(id=br_id, part=DEFAULT_PART, streamId=stream_id).execute()
         return result
 
@@ -189,18 +196,22 @@ class YouTube:
         if parsed_uri.scheme == '' and Path(thumbnail_uri).exists():
             file = open(thumbnail_uri, 'rb')
             mime = mimetypes.guess_file_type(thumbnail_uri)[0]
+            message = 'from local file ' + Path(thumbnail_uri).name
         elif parsed_uri.scheme == 'file':
             path = urllib.parse.unquote_plus(os.path.join(parsed_uri.netloc + parsed_uri.path))
             file = open(path, 'rb')
             mime = mimetypes.guess_file_type(path)[0]
+            message = 'from local file ' + Path(path).name
         else:
             response: HTTPResponse = urllib.request.urlopen(thumbnail_uri)
             file = tempfile.TemporaryFile()
             mime = response.headers.get_content_type()
             shutil.copyfileobj(response, file)
+            message = 'from remote URL ' + thumbnail_uri
 
         with file as fd:
             media_upload = MediaIoBaseUpload(fd, mime)
+            log.info('Updating thumbnail for broadcast "%s" %s', broadcast['id'], message)
             result = self._service.thumbnails().set(videoId=broadcast['id'], media_body=media_upload).execute()
         broadcast['snippet']['thumbnails'] = result['items'][0]
         return broadcast

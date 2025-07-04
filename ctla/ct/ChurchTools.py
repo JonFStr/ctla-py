@@ -91,6 +91,7 @@ class ChurchTools:
         """Cache the fact masterdata in this instance. Do nothing if cache exists"""
         if self._facts_cache is not None:
             return
+        log.info('Caching fact masterdata…')
         r = self._do_get('/facts')
         if r.status_code != 200:
             log.error(f'Response error when fetching fact masterdata [{r.status_code}]: "{r.content}"')
@@ -101,6 +102,7 @@ class ChurchTools:
         """Get the facts for the event with id `event_id`, as dict"""
         self.cache_facts()
 
+        log.info('Collecting event facts…')
         r = self._do_get(f'/events/{event_id}/facts')
         if r.status_code != 200:
             log.error(f'Response error when fetching facts for {event_id} [{r.status_code}]: "{r.content}"')
@@ -119,6 +121,7 @@ class ChurchTools:
         from_limit = datetime.date.today().isoformat()
         to_limit = (datetime.date.today() + timedelta(days=days)).isoformat()
 
+        log.info('Retrieving upcoming event data…')
         r = self._do_get('/events', canceled=True, **{'from': from_limit}, to=to_limit)
         if r.status_code != 200:
             log.error(f'Response error when fetching upcoming events [{r.status_code}]: "{r.content}"')
@@ -141,6 +144,7 @@ class ChurchTools:
             'url': link
         })
 
+        log.info(f'Attaching stream link {link} to "{event.title}" ({event.id})')
         if r.status_code != 201:
             log.error(f'Error when setting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
             return False
@@ -161,6 +165,7 @@ class ChurchTools:
         :param event: The event to delete the stream link from
         :return: True on success
         """
+        log.info(f'Deleting stream link from "{event.title}" ({event.id})')
         r = self._do_delete(f'/files/{event.yt_link.id}')
         if r.status_code != 204:
             log.error(f'Error when deleting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
@@ -173,6 +178,7 @@ class ChurchTools:
         :param event: The event to get the appointment for
         :return: The appointment
         """
+        log.info(f'Fetching calendar entry ({event.appointment_id}) for "{event.title}" ({event.id})')
         r = self._do_get(f'/calendars/{event.category_id}/appointments/{event.appointment_id}')
         if r.status_code != 200:
             log.error(f'Error retrieving appointment for Event "{event.title}" '
