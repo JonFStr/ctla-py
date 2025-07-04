@@ -5,16 +5,15 @@ from collections.abc import Generator
 from datetime import timedelta
 from typing import Any
 
-import requests
-
 import config
+from RestAPI import RestAPI
 from .CtEvent import CtEvent
 from .EventFile import EventFile, EventFileType
 
 log = logging.getLogger(__name__)
 
 
-class ChurchTools:
+class ChurchTools(RestAPI):
     """
     The ChurchTools-API main class.
     """
@@ -44,48 +43,9 @@ class ChurchTools:
             exit(1)
 
         self.urlbase = urllib.parse.urlunsplit(('https', instance, '/api', '', ''))
-        self.token = token
+        self._headers = {'Authorization': f'Login {token}'}
 
         log.info('Initialized ChurchTools API.')
-
-    @property
-    def __headers(self):
-        return {'Authorization': f'Login {self.token}'}
-
-    def _do_get(self, path: str, **kwargs) -> requests.Response:
-        """
-        Perform GET request to ChurchTools
-
-        :param path: The API endpoint
-        :param kwargs: Query parameters
-        :return: The `requests`-library's Response-object.
-        """
-        url = self.urlbase + path
-        log.debug(f'Perform GET request to {url} (parameters: {kwargs})')
-        return requests.get(url, params=kwargs, headers=self.__headers)
-
-    def _do_post(self, path: str, json: dict[str, Any]):
-        """
-        Perform POST request to ChurchTools
-
-        :param path: The API endpoint
-        :param json: JSON encodable request body
-        :return: The `requests`-library's Response-object.
-        """
-        url = self.urlbase + path
-        log.debug(f'Perform POST request to {url} (data: {json})')
-        return requests.post(url, json=json, headers=self.__headers)
-
-    def _do_delete(self, path: str):
-        """
-        Perform DELETE request to ChurchTools
-
-        :param path: The API endpoint
-        :return: The `requests`-library's Response-object.
-        """
-        url = self.urlbase + path
-        log.debug(f'Perform DELETE request to {url}')
-        return requests.delete(url, headers=self.__headers)
 
     def cache_facts(self):
         """Cache the fact masterdata in this instance. Do nothing if cache exists"""
