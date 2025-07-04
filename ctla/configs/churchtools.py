@@ -10,11 +10,13 @@ class ManageStreamBehaviorConf(TypedDict):
     - *name*: Name of the Fact
     - *yes_value*: Value equaling to "yes" (create a stream)
     - *ignore_value*: Value equaling to "ignore" (don't touch this event)
+    - *no_value*: Value equaling to "no" (don't create a stream, and delete existing streams)
     - *default*: Default value to use when any other value is set
     """
     name: str
     yes_value: str
     ignore_value: str
+    no_value: str
     default: str
 
 
@@ -45,10 +47,12 @@ class IncludeInCalConf(TypedDict):
 
     - *name*: Name of the Fact
     - *yes_value*: Value equaling to 'yes' / True (do include in calendar)
+    - *no_value*: Value equaling to 'no' / False (don't include in calendar)
     - *default*: Default behavior
     """
     name: str
     yes_value: str
+    no_value: str
     default: bool
 
 
@@ -59,11 +63,13 @@ class ShowOnHomepageConf(TypedDict):
     Attributes:
 
     - *name*: Name of the Fact
-    - *yes_value*: Value equaling to 'yes' / True (do include in calendar)
+    - *yes_value*: Value equaling to 'yes' / True (do show on homepage)
+    - *no_value*: Value equaling to 'no' / False (don't show on homepage)
     - *default*: Default behavior
     """
     name: str
     yes_value: str
+    no_value: str
     default: bool
 
 

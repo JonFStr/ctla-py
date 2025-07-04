@@ -7,6 +7,7 @@
       "name": "Livestream",
       "yes_value": "Yes",
       "ignore_value": "Ignore",
+      "no_value": "No",
       "default": "No"
     },
     "stream_visibility_fact": {
@@ -19,11 +20,13 @@
     "include_in_cal_fact": {
       "name": "Livestream in calendar",
       "yes_value": "Yes",
+      "no_value": "No",
       "default": false
     },
     "show_on_homepage_fact": {
       "name": "Livestream on Homepage",
       "yes_value": "Yes",
+      "no_value": "No",
       "default": false
     },
     "thumbnail_name": "YouTube-Thumbnail",

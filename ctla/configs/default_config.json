@@ -5,6 +5,7 @@
       "name": "Livestream",
       "yes_value": "Yes",
       "ignore_value": "Ignore",
+      "no_value": "No",
       "default": "No"
     },
     "stream_visibility_fact": {

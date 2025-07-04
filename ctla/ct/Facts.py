@@ -28,21 +28,28 @@ class Facts:
     def from_api_json(cls, facts: dict[str, int | str]):
         """Create instance from API results"""
         # Behavior
-        bf = facts.get(config.churchtools['manage_stream_behavior_fact']['name'],
-                       config.churchtools['manage_stream_behavior_fact']['default'])
+        behavior = _get_default_behavior_value()
+        bf = facts.get(config.churchtools['manage_stream_behavior_fact']['name'],  # Get the value from Churchtools,
+                       config.churchtools['manage_stream_behavior_fact']['default'])  # Default if unset
         if bf == config.churchtools['manage_stream_behavior_fact']['yes_value']:
             behavior = ManageStreamBehavior.YES
         elif bf == config.churchtools['manage_stream_behavior_fact']['ignore_value']:
             behavior = ManageStreamBehavior.IGNORE
-        else:
+        elif bf == config.churchtools['manage_stream_behavior_fact']['no_value']:
             behavior = ManageStreamBehavior.NO
 
         # Link in Calendar
-        lf = facts.get(config.churchtools['include_in_cal_fact']['name'])
-        if lf is not None:
-            link_in_cal = lf == config.churchtools['include_in_cal_fact']['yes_value']
+        lf_conf = config.churchtools['include_in_cal_fact']
+        if lf_conf is None:
+            link_in_cal = False
         else:
-            link_in_cal = config.churchtools['include_in_cal_fact']['default']
+            link_in_cal = lf_conf['default']
+            lf = facts.get(lf_conf['name'])
+            if lf is not None:
+                if lf == lf_conf['yes_value']:
+                    link_in_cal = True
+                elif lf == lf_conf['no_value']:
+                    link_in_cal = False
 
         # Visibility
         vf = facts.get(config.churchtools['stream_visibility_fact']['name'],
@@ -74,3 +81,18 @@ class Facts:
             visibility=visibility,
             on_homepage=on_homepage
         )
+
+
+def _get_default_behavior_value() -> ManageStreamBehavior:
+    """Retrieve the default value for the Stream Behavior Fact from config"""
+    bf_conf = config.churchtools['manage_stream_behavior_fact']
+    default = bf_conf['default']
+    if default == bf_conf['yes_value']:
+        return ManageStreamBehavior.YES
+    elif default == bf_conf['no_value']:
+        return ManageStreamBehavior.NO
+    elif default == bf_conf['ignore_value']:
+        return ManageStreamBehavior.IGNORE
+    else:
+        raise ValueError('Config value for "churchtools.manage_stream_behavior_fact.default" must match one of '
+                         'the given values for Yes, No or Ignore')
