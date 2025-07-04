@@ -166,3 +166,30 @@ class ChurchTools:
             log.error(f'Error when deleting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
             return False
         return True
+
+    def get_calendar_entry(self, event: CtEvent) -> dict[str, Any]:
+        """
+        Get the calendar entry (appointment) corresponding to the given event
+        :param event: The event to get the appointment for
+        :return: The appointment
+        """
+        r = self._do_get(f'/calendars/{event.category_id}/appointments/{event.appointment_id}')
+        if r.status_code != 200:
+            log.error(f'Error retrieving appointment for Event "{event.title}" '
+                      f'(#{event.id}, appointmentId: {event.appointment_id}')
+            r.raise_for_status()
+        return r.json()['data']
+
+    def update_calendar_link(self, event: CtEvent, link: str):
+        """
+        Update the calendar entry with the new link.
+
+        This function does not ensure that the modified appointment is not repeating
+
+        :param event: The event whose calendar event should be updated
+        :param link: The link to be set
+        :return:
+        """
+        raise NotImplementedError
+        appointment = self.get_calendar_entry(event)
+        appointment['link'] = link

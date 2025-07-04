@@ -13,6 +13,7 @@ class CtEvent:
     """Class holding data about an Event"""
     id: int
     category_id: int
+    appointment_id: int
     start_time: datetime
     end_time: datetime
     title: str
@@ -41,6 +42,7 @@ class CtEvent:
         return cls(
             id=event['id'],
             category_id=int(event['calendar']['domainIdentifier']),
+            appointment_id=int(event['appointmentId']),
             start_time=datetime.fromisoformat(event['startDate']),
             end_time=datetime.fromisoformat(event['endDate']),
             title=event['name'],
