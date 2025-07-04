@@ -215,3 +215,11 @@ class YouTube:
             result = self._service.thumbnails().set(videoId=broadcast['id'], media_body=media_upload).execute()
         broadcast['snippet']['thumbnails'] = result['items'][0]
         return broadcast
+
+    def delete_broadcast(self, br_id: str):
+        """
+        Delete a broadcast
+        :param br_id: ID of the broadcast to delete
+        """
+        log.info(f'Deleting Broadcast {br_id}')
+        self._live_broadcasts.delete(id=br_id).execute()

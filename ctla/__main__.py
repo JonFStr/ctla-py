@@ -19,12 +19,19 @@ ct = ChurchTools()
 yt = YouTube()
 
 events = setup.gather_event_info(ct, yt)
+
+# TODO debug statements:
 events = [ev for ev in events if ev.category_id == 30]
-pprint.pprint(events)
+log.info(pprint.pformat(events))
 
 for event in events:
     if event.wants_stream:
         if not event.yt_broadcast:
+            if event.yt_link:
+                # Link is present, but Stream isn't: Delete the old link
+                ct.delete_stream_link(event)
             update.create_youtube(ct, yt, event)
 
-        update.update_youtube(yt, event)  # TODO
+        update.update_youtube(yt, event)
+    else:
+        delete.delete_stream(ct, yt, event)
