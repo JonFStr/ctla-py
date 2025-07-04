@@ -19,8 +19,8 @@ ct = ChurchTools()
 yt = YouTube()
 
 events = setup.gather_event_info(ct, yt)
-events = (ev for ev in events if ev.category_id == 30)
-pprint.pprint(list(events))
+events = [ev for ev in events if ev.category_id == 30]
+pprint.pprint(events)
 
 for event in events:
     if event.wants_stream:

@@ -90,11 +90,11 @@ class YouTube:
     def create_broadcast(self, title: str, start: datetime, privacy: PrivacyStatus) -> LiveBroadcast:
         # noinspection GrazieInspection
         """
-                Create a new `LiveBroadcast` and return it.
+        Create a new `LiveBroadcast` and return it.
 
-                This applies the configuration from "youtube.broadcast_settings" in the config file
-                :return: the newly created LiveBroadcast resource
-                """
+        This applies the configuration from "youtube.broadcast_settings" in the config file
+        :return: the newly created LiveBroadcast resource
+        """
         if len(title) > 100:
             raise ValueError('Title may not be longer than 100 characters')
         if '<' in title or '>' in title:

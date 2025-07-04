@@ -42,19 +42,25 @@ def update_youtube(yt: YouTube, ev: Event):
     if not ev.yt_broadcast:
         return
     bc = ev.yt_broadcast
+    bc_snippet = bc.get('snippet', {})
     data = dict()
 
     yt_title = ev.yt_title
-    if yt_title != bc['snippet']['title']:
+    if yt_title != bc_snippet.get('title'):
         data['title'] = yt_title
 
     yt_desc = ev.yt_description
-    if yt_desc != bc['snippet']['title']:
+    if yt_desc != bc_snippet.get('title'):
         data['desc'] = yt_desc
-    if ev.start_time != datetime.datetime.fromisoformat(bc['snippet']['scheduledStartTime']):
+
+    start_str = bc_snippet.get('scheduledStartTime')
+    if not start_str or ev.start_time != datetime.datetime.fromisoformat(start_str):
         data['start'] = ev.start_time
-    if ev.end_time != datetime.datetime.fromisoformat(bc['snippet']['scheduledEndTime']):
+
+    end_str = bc_snippet.get('scheduledEndTime')
+    if not end_str or ev.end_time != datetime.datetime.fromisoformat(end_str):
         data['end'] = ev.end_time
+
     if ev.yt_visibility != bc['status']['privacyStatus']:
         data['privacy'] = ev.yt_visibility
 
