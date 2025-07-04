@@ -57,5 +57,17 @@
       "enable_auto_stop": false
     }
   },
-  "wordpress": {}
+  "wordpress": {
+    "enabled": true,
+    "days_to_show_in_advance": 6,
+    "allow_parallel_display": true,
+    "pages": {
+      "42": "livestream-links"
+    },
+    "content_tag": "ct-livestreams",
+    "content_templates": {
+      "livestream-links": "<a href=\"${video_link}\">${title} on ${datetime}</a>\n"
+    },
+    "datetime_format": "%d.%m.%Y"
+  }
 }

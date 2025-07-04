@@ -6,6 +6,7 @@ from typing import TypedDict
 import utils
 from configs import args
 from configs.churchtools import ChurchToolsConf
+from configs.wordpress import WordPressConf
 from configs.youtube import YouTubeConf
 
 log = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ class Config(TypedDict):
 # Easy access to loaded config
 churchtools: ChurchToolsConf
 youtube: YouTubeConf
-wordpress: None
+wordpress: WordPressConf
 # noinspection PyTypeChecker
 churchtools, youtube, wordpress = {}, {}, {}
 

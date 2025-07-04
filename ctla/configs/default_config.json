@@ -40,5 +40,13 @@
       "enable_auto_stop": false
     }
   },
-  "wordpress": {}
+  "wordpress": {
+    "enabled": false,
+    "days_to_show_in_advance": 6,
+    "allow_parallel_display": true,
+    "pages": {},
+    "content_tag": "ct-livestreams",
+    "content_templates": {},
+    "datetime_format": "%d.%m.%Y"
+  }
 }
