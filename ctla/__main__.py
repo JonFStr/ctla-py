@@ -7,6 +7,7 @@ import setup
 import update
 from configs import args
 from ct.ChurchTools import ChurchTools
+from wp.WordPress import WordPress
 from yt.YouTube import YouTube
 
 logging.basicConfig(level=logging.DEBUG)
@@ -35,3 +36,8 @@ for event in events:
         update.update_youtube(yt, event)
     else:
         delete.delete_stream(ct, yt, event)
+
+# WordPress
+if config.wordpress['enabled']:
+    wp = WordPress()
+    update.update_wordpress(wp, [ev for ev in events if ev.yt_link and ev.facts.on_homepage])

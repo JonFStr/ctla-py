@@ -3,10 +3,14 @@ Update functions: create & update events, broadcasts, stuff
 """
 import datetime
 import logging
+import operator
+from string import Template
 
 import config
 from ct.ChurchTools import ChurchTools
 from data import Event
+from wp import WordPressPage
+from wp.WordPress import WordPress
 from yt.YouTube import YouTube
 from yt.type_hints import LiveBroadcast
 
@@ -67,3 +71,72 @@ def update_youtube(yt: YouTube, ev: Event):
     bc = yt.set_broadcast_info(bc, **data)
     bc = yt.set_thumbnails(bc, ev.yt_thumbnail.url if ev.yt_thumbnail else config.youtube['thumbnail_uri'])
     ev.yt_broadcast = bc
+
+
+def _render_templates(events: list[Event]) -> dict[str, str]:
+    """
+    Populate the templates from config with the given events
+    :param events: The events to pull the data from
+    :return: A dictionary mapping the template keys to the compiled content
+    """
+    events = sorted(events, key=operator.attrgetter('start_time'))
+
+    # Render templates
+    active_templates = set(config.wordpress.get('pages').values())
+    rendered_templates: dict[str, str] = {}
+
+    for template_key in active_templates:
+        try:
+            template = Template(config.wordpress['content_templates'][template_key])
+        except KeyError:
+            log.critical(f'Could not find template for key "{template_key}" in config "wordpress.content_templates".')
+            exit(1)
+
+        rendered = ''
+
+        prev_end: datetime = datetime.datetime.fromtimestamp(0)
+        for event in events:
+            if not event.facts.on_homepage:
+                continue
+
+            # If the pre_time is before the end of the previous event and parallel display is disabled,
+            # Set its pre_time to the end of the previous event.
+            pre_time = event.start_time - datetime.timedelta(config.wordpress['days_to_show_in_advance'])
+            if not config.wordpress['allow_parallel_display'] and pre_time < prev_end:
+                pre_time = prev_end
+
+            rendered += '\n' + template.safe_substitute({
+                'title': event.title,
+                'pre_iso': pre_time.isoformat(),
+                'start_iso': event.start_time.isoformat(),
+                'end_iso': event.end_time.isoformat(),
+                'datetime': event.start_time.strftime(config.wordpress['datetime_format']),
+                'video_link': event.yt_link.url
+            }) + '\n'
+
+            prev_end = event.end_time
+
+        rendered_templates[template_key] = rendered
+    return rendered_templates
+
+
+def update_wordpress(wp: WordPress, events: list[Event]):
+    """
+    Update all configured WordPress pages with event information
+    :param wp: The WordPress API instance
+    :param events: The list of events to display in WordPress
+    """
+    rendered_templates = _render_templates(events)
+    log.info(f'Adding {len(events)} to WordPress pages…')
+
+    # Update all pages
+    for page_id, template_key in config.wordpress.get('pages', {}).items():
+        page = wp.get_page(page_id)
+
+        new_page = WordPressPage.insert_content(page, rendered_templates[template_key])
+
+        if new_page:
+            wp.update_page(page_id, new_page)
+            log.info(f'Updated page {page_id}.')
+        else:
+            log.error(f'Could not update page {page_id} because the content could not be inserted.')
