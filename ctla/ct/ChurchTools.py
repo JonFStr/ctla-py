@@ -18,7 +18,6 @@ class ChurchTools(RestAPI):
     The ChurchTools-API main class.
     """
 
-    urlbase: str
     token: str
     _facts_cache: dict[int, str] = None
 

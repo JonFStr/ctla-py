@@ -59,6 +59,9 @@
   },
   "wordpress": {
     "enabled": true,
+    "url": "https://wordpress.test/",
+    "user": "ctla_bot",
+    "app_password": "XXXX XXXX XXXX XXXX XXXX XXXX",
     "days_to_show_in_advance": 6,
     "allow_parallel_display": true,
     "pages": {

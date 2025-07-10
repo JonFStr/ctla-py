@@ -19,7 +19,7 @@ class WordPressConf(TypedDict):
     (set from the `Application Password <https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/>`__)
     """
     days_to_show_in_advance: int
-    """How many days in advance a stream should be displayed"""
+    """At how many days before the event the ``pre_iso`` variable should be set to"""
     allow_parallel_display: bool
     """Whether to allow multiple events to be displayed (before their respective start) together"""
     pages: dict[int, str]
@@ -41,11 +41,14 @@ class WordPressConf(TypedDict):
     Available variables are:
     
     - title
-    - pre_timestamp
-    - start_timestamp
-    - end_timestamp
-    - datetime
-    - video_link
+    - pre_iso  -- ISO format of when this event will start to be included
+    - start_iso  -- ISO format of when this event will start
+    - end_iso  -- ISO format of when this event will end
+    - datetime  -- Start time formatted according to :py:attr:`datetime_format`
+    - video_link  -- Link to the YouTube video
+    
+    It is recommended to use the `Timed Content <https://wordpress.org/plugins/timed-content/>`__ plugin
+    or something similar to select when the different streams are displayed
     """
     datetime_format: str
     """
