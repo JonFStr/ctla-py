@@ -6,17 +6,18 @@ This is not a plug-and-play script, but most likely requires to be tested and mo
 - The metadata parsing is tailored to the "Download Manager" WordPress-Plugin
 - and probably more. Just test before you use it :)
 """
+import json
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime
-from xml.etree.ElementTree import Element
 from zoneinfo import ZoneInfo
 
 import phpserialize
+from dataclasses_json import DataClassJsonMixin
 
 
 @dataclass
-class Post:
+class Post(DataClassJsonMixin):
     id: int
     title: str
     date: datetime
@@ -25,7 +26,7 @@ class Post:
     categories: list[str]
     wpdm: dict
     meta: dict
-    xml: Element
+    # xml: ET.Element
 
 
 def _parse_all(path: str) -> list[Post]:
@@ -85,7 +86,7 @@ def _parse_all(path: str) -> list[Post]:
             categories=[i.text for i in item.findall("./category[@domain='wpdmcategory']")],
             wpdm=wpdm,
             meta=meta,
-            xml=item
+            # xml=item
         ))
 
     return result
@@ -122,3 +123,19 @@ def _split_parsed(parsed: list[Post]):
 all_posts = []
 categorized = {}
 filtered = {}
+
+if __name__ == '__main__':
+    _split_parsed(_parse_all('export.xml'))
+
+    with open('parsed_export.json', 'w') as f:
+        w: Post
+        json.dump({k: [w.to_dict(True) for w in v] for k, v in categorized.items()}, f, ensure_ascii=False)
+
+"""
+Liederbuch-Kategorie weg
+Neue Songs-Kategorie weg
+
+Gäste:
+- Veröffentlichungen
+Rest in intern
+"""
