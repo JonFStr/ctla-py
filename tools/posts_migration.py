@@ -52,7 +52,7 @@ def _parse_all(path: str) -> list[Post]:
 
     for item in items:
         wpdm: dict[str, str | dict] = {}  # DownloadManager metadata
-        meta: dict[str, str] = {}  # General metadata
+        meta: dict[str, str | dict] = {}  # General metadata
         for meta_tag in item.findall('wp:postmeta', namespaces):
             key = meta_tag.findtext('wp:meta_key', None, namespaces)
             value = meta_tag.findtext('wp:meta_value', None, namespaces)
@@ -67,14 +67,10 @@ def _parse_all(path: str) -> list[Post]:
 
             else:
                 if not key.startswith('__wpdmkey') and not key.startswith('_oembed_') and key not in meta_ignored_keys:
-                    meta[key] = value
-
-        # Filter WPDM metadata
-        wpdm = {
-            k: v for k, v in wpdm.items() if
-            not (k == 'page_template' and v == 'page-template-default.php')  # Default template (page)
-            and not (k == 'access' and v == 'a:1:{i:0;s:5:"guest";}')  # Wildcard access
-        }
+                    if key == '_wp_attachment_metadata':
+                        meta[key] = phpserialize.loads(value.encode('utf-8'), decode_strings=True)
+                    else:
+                        meta[key] = value
 
         result.append(Post(
             id=int(item.findtext('wp:post_id', None, namespaces)),
@@ -107,12 +103,9 @@ def _split_parsed(parsed: list[Post]):
 
     for post in parsed:
         all_posts.append(post)
-        categories = post.categories
-        if not categories:
-            categories = [None]  # None-key holds only uncategorized posts
 
-        for cat in categories:
-            if cat == 'Veranstaltungen' and 'Gottesdienste' in categories:
+        for cat in post.categories:
+            if cat == 'Veranstaltungen' and 'Gottesdienste' in post.categories:
                 continue  # Remove common duplicate pair of categories
             categorized.setdefault(cat, []).append(post)
 
