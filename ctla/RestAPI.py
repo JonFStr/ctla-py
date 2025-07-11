@@ -23,7 +23,7 @@ class RestAPI:
 
         :param path: The API endpoint
         :param kwargs: Query parameters
-        :return: The `requests`-library's Response-object.
+        :return: The ``requests``-library's Response-object.
         """
         url = self.urlbase + path
         log.debug(f'Perform GET request to {url} (parameters: {kwargs})')
@@ -31,22 +31,34 @@ class RestAPI:
 
     def _do_post(self, path: str, json: dict[str, Any]):
         """
-        Perform POST request to ChurchTools
+        Perform POST request
 
         :param path: The API endpoint
         :param json: JSON encodable request body
-        :return: The `requests`-library's Response-object.
+        :return: The ``requests``-library's Response-object.
         """
         url = self.urlbase + path
         log.debug(f'Perform POST request to {url} (data: {json})')
         return requests.post(url, json=json, headers=self._headers, auth=self._auth)
 
-    def _do_delete(self, path: str):
+    def _do_patch(self, path: str, json: dict[str, Any]):
         """
-        Perform DELETE request to ChurchTools
+        Perform PATCH request
 
         :param path: The API endpoint
-        :return: The `requests`-library's Response-object.
+        :param json: JSON encodable request body
+        :return: The ``request``-library's Response object
+        """
+        url = self.urlbase + path
+        log.debug(f'Perform PATCH request to {url} (data: {json})')
+        return requests.patch(url, json=json, headers=self._headers, auth=self._auth)
+
+    def _do_delete(self, path: str):
+        """
+        Perform DELETE request
+
+        :param path: The API endpoint
+        :return: The ``requests``-library's Response-object.
         """
         url = self.urlbase + path
         log.debug(f'Perform DELETE request to {url}')
