@@ -99,6 +99,12 @@ def _split_parsed(parsed: list[Post]):
     """
     Split the parsed items into categories
     """
+
+    def contains(p, search):
+        """Case-insensitive search in title and content for substring ``search``"""
+        search = search.lower()
+        return p.title and search in p.title.lower() or p.content and search in p.content.lower()
+
     for post in parsed:
         all_posts.append(post)
         categories = post.categories
@@ -106,13 +112,20 @@ def _split_parsed(parsed: list[Post]):
             categories = [None]  # None-key holds only uncategorized posts
 
         for cat in categories:
-            categorized_list = categorized.get(cat, None)
-            if categorized_list:
-                categorized[cat].append(post)
-            else:
-                categorized[cat] = [post]
+            if cat == 'Veranstaltungen' and 'Gottesdienste' in categories:
+                continue  # Remove common duplicate pair of categories
+            categorized.setdefault(cat, []).append(post)
+
+        if contains(post, 'youtu'):
+            # This post likely contains a YouTube link
+            filtered.setdefault('youtube', []).append(post)
+        elif not post.content or not post.content.strip():
+            # This post does not have content (or only whitespace); probably only files
+            filtered.setdefault('nocontent', []).append(post)
+        else:
+            filtered.setdefault(None, []).append(post)
 
 
 all_posts = []
 categorized = {}
-_split_parsed(_parse_all('export.xml'))
+filtered = {}
