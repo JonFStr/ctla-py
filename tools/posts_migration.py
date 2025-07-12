@@ -10,6 +10,7 @@ import json
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 from zoneinfo import ZoneInfo
 
 import phpserialize
@@ -27,6 +28,13 @@ class Post(DataClassJsonMixin):
     wpdm: dict
     meta: dict
     # xml: ET.Element
+    ct_status: Optional[str | int] = None
+    """
+    Status of this post in churchtools:
+    - ``skip``: don't upload
+    - ``private``: Video is set to private
+    - ``<id>``: ID of the ChurchTools Post
+    """
 
 
 def _parse_all(path: str) -> list[Post]:
@@ -128,7 +136,6 @@ if __name__ == '__main__':
     _split_parsed(_parse_all('export.xml'))
 
     with open('parsed_export.json', 'w') as f:
-        w: Post
         json.dump({k: [w.to_dict(True) for w in v] for k, v in categorized.items()}, f, ensure_ascii=False)
 
 """
