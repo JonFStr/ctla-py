@@ -42,7 +42,7 @@
   },
   "wordpress": {
     "enabled": false,
-    "days_to_show_in_advance": 6,
+    "hours_to_show_in_advance": 144,
     "allow_parallel_display": true,
     "pages": {},
     "content_tag": "ct-livestreams",

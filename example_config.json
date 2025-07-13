@@ -62,7 +62,7 @@
     "url": "https://wordpress.test/",
     "user": "ctla_bot",
     "app_password": "XXXX XXXX XXXX XXXX XXXX XXXX",
-    "days_to_show_in_advance": 6,
+    "hours_to_show_in_advance": 144,
     "allow_parallel_display": true,
     "pages": {
       "42": "livestream-links"

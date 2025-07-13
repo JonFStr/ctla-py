@@ -18,8 +18,8 @@ class WordPressConf(TypedDict):
     
     (set from the `Application Password <https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/>`__)
     """
-    days_to_show_in_advance: int
-    """At how many days before the event the ``pre_iso`` variable should be set to"""
+    hours_to_show_in_advance: int
+    """At how many hours before the event the ``pre_iso`` variable should be set to"""
     allow_parallel_display: bool
     """Whether to allow multiple events to be displayed (before their respective start) together"""
     pages: dict[int, str]

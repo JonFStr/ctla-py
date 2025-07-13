@@ -101,7 +101,7 @@ def _render_templates(events: list[Event]) -> dict[str, str]:
 
             # If the pre_time is before the end of the previous event and parallel display is disabled,
             # Set its pre_time to the end of the previous event.
-            pre_time = event.start_time - datetime.timedelta(config.wordpress['days_to_show_in_advance'])
+            pre_time = event.start_time - datetime.timedelta(hours=config.wordpress['hours_to_show_in_advance'])
             if not config.wordpress['allow_parallel_display'] and pre_time < prev_end:
                 pre_time = prev_end
 
