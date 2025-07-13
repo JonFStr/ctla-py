@@ -62,10 +62,17 @@ class YouTubeConf(TypedDict):
     """Path where the app stores the API Tokens received from Google"""
     templates: YouTubeTemplateConf
     """Template configuration for YouTube title / description"""
-    thumbnail_uri: str
+    default_thumbnail_uri: str
     """
     URI to a default thumbnail to be set on all new streams.
     Can be a path to a file, a `file://`-URI or web address
+    """
+    thumbnail_uris: list[tuple[str, str]]
+    """
+    List of lists for thumbnails of recurring events.
+    
+    If an event's title contains the first value of an entry (case-sensitive), the corresponding thumbnail (2nd value)
+    will be used.
     """
     stream_key_id: str
     """The identifier of the stream key to use (not the key itself!)"""

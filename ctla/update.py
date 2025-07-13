@@ -36,6 +36,19 @@ def create_youtube(ct: ChurchTools, yt: YouTube, event: Event):
     ct.set_stream_link(event, f'https://youtu.be/{bc['id']}')
 
 
+def _get_thumbnail_uri(title: str) -> str:
+    """
+    Return the thumbnail URI for the given title from the config
+
+    Scans through ``youtube.thumbnail_uris`` for a key that is contained in ``title``
+    and returns the default thumbnail if no match was found
+    """
+    for search, uri in config.youtube.get('thumbnail_uris', []):
+        if search in title:
+            return uri
+    return config.youtube['default_thumbnail_uri']
+
+
 def update_youtube(yt: YouTube, ev: Event):
     """
     Update the information on YouTube to reflect the one given in ChurchTools.
@@ -71,7 +84,7 @@ def update_youtube(yt: YouTube, ev: Event):
         data['privacy'] = ev.yt_visibility
 
     bc = yt.set_broadcast_info(bc, **data)
-    bc = yt.set_thumbnails(bc, ev.yt_thumbnail.url if ev.yt_thumbnail else config.youtube['thumbnail_uri'])
+    bc = yt.set_thumbnails(bc, ev.yt_thumbnail.url if ev.yt_thumbnail else _get_thumbnail_uri(ev.title))
     ev.yt_broadcast = bc
 
 

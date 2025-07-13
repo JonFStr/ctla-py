@@ -44,7 +44,11 @@
       "dateformat": "%d.%m.%Y"
     },
     "stream_key_id": "STREAM_KEY_ID_HERE",
-    "thumbnail_uri": "https://http.cat/404.jpg",
+    "default_thumbnail_uri": "https://http.cat/404.jpg",
+    "thumbnail_uris": {
+      "Sunday": "https://example.local/thumbnails/sunday.jpg",
+      "Youth Group": "https://example.local/thumbnails/youth.jpg"
+    },
     "broadcast_settings": {
       "enable_monitor_stream": true,
       "broadcast_stream_delay_ms": 0,
