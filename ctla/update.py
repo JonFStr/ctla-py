@@ -4,6 +4,7 @@ Update functions: create & update events, broadcasts, stuff
 import datetime
 import logging
 import operator
+import urllib.parse
 from string import Template
 
 import config
@@ -111,7 +112,8 @@ def _render_templates(events: list[Event]) -> dict[str, str]:
                 'start_iso': event.start_time.isoformat(),
                 'end_iso': event.end_time.isoformat(),
                 'datetime': event.start_time.strftime(config.wordpress['datetime_format']),
-                'video_link': event.yt_link.url
+                'video_link': event.yt_link.url,
+                'video_link_quoted': urllib.parse.quote(event.yt_link.url)
             }) + '\n'
 
             prev_end = event.end_time
