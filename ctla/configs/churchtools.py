@@ -35,17 +35,17 @@ class StreamVisibilityConf(TypedDict):
     """Default value to use when any other value is set"""
 
 
-class IncludeInCalConf(TypedDict):
+class BooleanFactConf(TypedDict):
     """
-    Dataclass configuring the ChurchTools fact for including the stream link inside the calendar entry
+    Dataclass a ChurchTools fact that will be parsed to a boolean value
     """
 
     name: str
     """Name of the Fact"""
     yes_value: str
-    """Value equaling to 'yes' / True (do include in calendar)"""
+    """Value equaling to 'yes' / True"""
     no_value: str
-    """Value equaling to 'no' / False (don't include in calendar)"""
+    """Value equaling to 'no' / False"""
     default: bool
     """Default behavior"""
 
@@ -79,7 +79,7 @@ class ChurchToolsConf(TypedDict):
 
     manage_stream_behavior_fact: ManageStreamBehaviorConf
     stream_visibility_fact: StreamVisibilityConf
-    include_in_cal_fact: Optional[IncludeInCalConf]
+    include_in_cal_fact: Optional[BooleanFactConf]
     show_on_homepage_fact: Optional[ShowOnHomepageConf]
 
     speaker_service_name: Optional[str]
