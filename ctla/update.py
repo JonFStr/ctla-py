@@ -6,6 +6,7 @@ import logging
 import operator
 import urllib.parse
 from string import Template
+from zoneinfo import ZoneInfo
 
 import config
 from ct.ChurchTools import ChurchTools
@@ -95,7 +96,7 @@ def _render_templates(events: list[Event]) -> dict[str, str]:
 
         rendered = ''
 
-        prev_end: datetime = datetime.datetime.fromtimestamp(0)
+        prev_end: datetime = datetime.datetime.fromtimestamp(0, tz=ZoneInfo('UTC'))
         for event in events:
             if not event.facts.on_homepage:
                 continue
