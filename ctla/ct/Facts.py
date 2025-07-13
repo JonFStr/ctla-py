@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 
 import config
+from configs.churchtools import BooleanFactConf
 
 
 class ManageStreamBehavior(Enum):
@@ -14,6 +15,23 @@ class YtVisibility(Enum):
     VISIBLE = auto()
     UNLISTED = auto()
     PRIVATE = auto()
+
+
+def _parse_boolean_fact(conf_name: str, facts: dict[str, int | str]) -> bool:
+    """Parse a boolean fact"""
+    # noinspection PyTypeChecker,PyTypedDict
+    conf: BooleanFactConf = config.churchtools.get(conf_name)
+    if conf is None:
+        result = False
+    else:
+        fact_val = facts.get(conf['name'])
+        result = conf['default']
+        if fact_val is not None:
+            if fact_val == conf['yes_value']:
+                result = True
+            elif fact_val == conf['no_value']:
+                result = False
+    return result
 
 
 @dataclass
@@ -38,19 +56,6 @@ class Facts:
         elif bf == config.churchtools['manage_stream_behavior_fact']['no_value']:
             behavior = ManageStreamBehavior.NO
 
-        # Link in Calendar
-        lf_conf = config.churchtools['include_in_cal_fact']
-        if lf_conf is None:
-            link_in_cal = False
-        else:
-            link_in_cal = lf_conf['default']
-            lf = facts.get(lf_conf['name'])
-            if lf is not None:
-                if lf == lf_conf['yes_value']:
-                    link_in_cal = True
-                elif lf == lf_conf['no_value']:
-                    link_in_cal = False
-
         # Visibility
         vf = facts.get(config.churchtools['stream_visibility_fact']['name'],
                        config.churchtools['stream_visibility_fact']['default'])
@@ -68,18 +73,11 @@ class Facts:
                 f'"{config.churchtools['stream_visibility_fact']['unlisted_value']}" or '
                 f'"{config.churchtools['stream_visibility_fact']['private_value']}", according to configuration.')
 
-        # On Homepage
-        hf = facts.get(config.churchtools['show_on_homepage_fact']['name'])
-        if hf is not None:
-            on_homepage = hf == config.churchtools['show_on_homepage_fact']['yes_value']
-        else:
-            on_homepage = config.churchtools['show_on_homepage_fact']['default']
-
         return Facts(
             behavior=behavior,
-            link_in_cal=link_in_cal,
+            link_in_cal=_parse_boolean_fact('include_in_cal_fact', facts),
             visibility=visibility,
-            on_homepage=on_homepage
+            on_homepage=_parse_boolean_fact('show_on_homepage', facts),
         )
 
 

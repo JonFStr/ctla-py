@@ -50,21 +50,6 @@ class BooleanFactConf(TypedDict):
     """Default behavior"""
 
 
-class ShowOnHomepageConf(TypedDict):
-    """
-    Dataclass configuring the ChurchTools fact for showing the stream on the WordPress site
-    """
-
-    name: str
-    """Name of the Fact"""
-    yes_value: str
-    """Value equaling to 'yes' / True (do show on homepage)"""
-    no_value: str
-    """Value equaling to 'no' / False (don't show on homepage)"""
-    default: bool
-    """Default behavior"""
-
-
 class ChurchToolsConf(TypedDict):
     """
     Dataclass holding configuration about ChurchTools
@@ -80,7 +65,8 @@ class ChurchToolsConf(TypedDict):
     manage_stream_behavior_fact: ManageStreamBehaviorConf
     stream_visibility_fact: StreamVisibilityConf
     include_in_cal_fact: Optional[BooleanFactConf]
-    show_on_homepage_fact: Optional[ShowOnHomepageConf]
+    show_on_homepage_fact: Optional[BooleanFactConf]
+    create_post_fact: Optional[BooleanFactConf]
 
     speaker_service_name: Optional[str]
     """Title of the ChurchTools service name containing the speaker's name"""

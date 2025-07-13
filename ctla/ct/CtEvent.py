@@ -35,9 +35,15 @@ class CtEvent:
         """
         # Find attached files we care about
         yt_link_data = next(
-            (f for f in event['eventFiles'] if f['title'] == config.churchtools['stream_attachment_name']), None)
-        yt_thumb_data = next((f for f in event['eventFiles'] if f['title'] == config.churchtools['thumbnail_name']),
-                             None)
+            (f for f in event['eventFiles'] if f['title'] == config.churchtools['stream_attachment_name']), None
+        )
+        yt_thumb_data = next(
+            (f for f in event['eventFiles'] if f['title'] == config.churchtools['thumbnail_name']), None
+        )
+        post_link_data = next(
+            (f for f in event['eventFiles']
+             if f['title'] == config.churchtools.get('post_settings', {}).get('attachment_name')), None
+        )
 
         return cls(
             id=event['id'],
