@@ -77,7 +77,7 @@ class ChurchTools(RestAPI):
         :raise HttpError (directly passed down from the requests module) if an error occurred
         """
         # Compute date instance for filter end date
-        from_limit = datetime.date.today().isoformat()
+        from_limit = (datetime.date.today() - timedelta(days=1)).isoformat()
         to_limit = (datetime.date.today() + timedelta(days=days)).isoformat()
 
         log.info('Retrieving upcoming event data…')
