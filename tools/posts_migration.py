@@ -112,11 +112,21 @@ def _split_parsed(parsed: list[Post]):
 
     for post in parsed:
         all_posts.append(post)
-
-        for cat in post.categories:
-            if cat == 'Veranstaltungen' and 'Gottesdienste' in post.categories:
-                continue  # Remove common duplicate pair of categories
-            categorized.setdefault(cat, []).append(post)
+        if 'Veröffentlichungen' in post.categories:  # prioritize this category and only put it in there
+            categorized.setdefault('Veröffentlichungen', []).append(post)
+        else:
+            if not post.categories:
+                categorized.setdefault('undefined', []).append(post)
+            for cat in post.categories:
+                if cat in {'Liederbuch', 'Neue Songs', 'Gastzugang', 'Kinder&amp;Familien', 'Dienstgruppe Lobpreis'}:
+                    continue  # Don't create these categories, but allow posts to exist in others
+                if cat == 'Veranstaltungen' and ('Gottesdienste' in post.categories or 'Material' in post.categories):
+                    continue  # Remove common duplicate pair of categories
+                if cat != 'Januartage' and 'Januartage' in post.categories:
+                    continue  # Januartage stay in their category
+                if cat == 'Material' and 'Zellgruppen' in post.categories:
+                    continue
+                categorized.setdefault(cat, []).append(post)
 
         if contains(post, 'youtu'):
             # This post likely contains a YouTube link
