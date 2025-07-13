@@ -19,7 +19,7 @@ config.load()
 ct = ChurchTools()
 yt = YouTube()
 
-events = setup.gather_event_info(ct, yt)
+events = list(setup.gather_event_info(ct, yt))
 
 # TODO debug statements:
 events = [ev for ev in events if ev.category_id == 30]
