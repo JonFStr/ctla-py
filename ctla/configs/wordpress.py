@@ -31,6 +31,12 @@ class WordPressConf(TypedDict):
     Example: if ``content_tag = 'ct-livestreams'``, then CTLA will search for the HTML comments
     ``<!-- ct-livestreams --><-- /ct-livestreams -->`` and put its content between these tags. 
     """
+    wpbakery_compat: bool
+    """
+    Enable compatibility with WPBakery.
+    This changes the embedding process to put the content inside a `WPBakery Raw HTML` block and modifies the search
+    to instead search for a raw html block with this class name.
+    """
     content_templates: dict[str, str]
     """
     Dictionary of content templates. Mapped to different pages via the :py:attr:`pages` dictionary

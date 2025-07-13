@@ -46,6 +46,7 @@
     "allow_parallel_display": true,
     "pages": {},
     "content_tag": "ct-livestreams",
+    "wpbakery_compat": false,
     "content_templates": {},
     "datetime_format": "%d.%m.%Y"
   }

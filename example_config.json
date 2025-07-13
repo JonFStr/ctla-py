@@ -68,6 +68,7 @@
       "42": "livestream-links"
     },
     "content_tag": "ct-livestreams",
+    "wpbakery_compat": false,
     "content_templates": {
       "livestream-links": "<a href=\"${video_link}\">${title} on ${datetime}</a>\n"
     },

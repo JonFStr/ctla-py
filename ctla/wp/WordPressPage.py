@@ -1,5 +1,8 @@
 """TypedDict classes for type hints"""
+import base64
 import logging
+import re
+import urllib.parse
 from typing import TypedDict, NamedTuple, NotRequired, Any, Optional
 
 import config
@@ -27,6 +30,7 @@ class WordPressPage(TypedDict):
     A WordPress page object
     """
     title: NotRequired[WordPressContent]
+    id: NotRequired[int]
     content: WordPressContent
 
 
@@ -89,14 +93,8 @@ def reassemble_page(parts: list[WordPressContentPart]) -> WordPressPage:
     return WordPressPage(content=WordPressContent(raw=content))
 
 
-def insert_content(page: WordPressPage, content: str) -> Optional[WordPressPage]:
-    """
-    Insert the rendered template into the page.
-
-    :param page: The WordPressPage to modify
-    :param content: The rendered template
-    :return: A new ``WordPressPage`` dictionary containing only the new content
-    """
+def _insert_plain_content(page: WordPressPage, content: str) -> Optional[WordPressPage]:
+    """Implementation for :py:func:`insert_content` in normal mode (``config.wordpress.wpbakery_compat`` is disabled)"""
     content_parts = split_page_content(page)
     if not content_parts:
         return None
@@ -109,3 +107,31 @@ def insert_content(page: WordPressPage, content: str) -> Optional[WordPressPage]
             new_parts.append(part)
 
     return reassemble_page(new_parts)
+
+
+def _insert_bakery_content(page: WordPressPage, content: str) -> Optional[WordPressPage]:
+    """Implementation for :py:func:`insert_content` when ``config.wordpress.wpbakery_compat`` is enabled"""
+    # Quote and encode the content
+    content = base64.b64encode(urllib.parse.quote(content, safe='').encode('utf-8')).decode('utf-8')
+
+    new_content, n = re.subn(
+        rf'(?<=\[vc_raw_html el_class="{config.wordpress['content_tag']}"])[a-zA-Z0-9+=/]*?(?=\[/vc_raw_html])',
+        content,
+        page['content']['raw']
+    )
+    log.info(f'Inserted content {n} times into "{page['title']['raw']}" (#{page['id']})')
+    return WordPressPage(content=WordPressContent(raw=new_content))
+
+
+def insert_content(page: WordPressPage, content: str) -> Optional[WordPressPage]:
+    """
+    Insert the rendered template into the page.
+
+    :param page: The WordPressPage to modify
+    :param content: The rendered template
+    :return: A new ``WordPressPage`` dictionary containing only the new content
+    """
+    if config.wordpress['wpbakery_compat']:
+        return _insert_bakery_content(page, content)
+    else:
+        return _insert_plain_content(page, content)
