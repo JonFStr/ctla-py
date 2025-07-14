@@ -29,6 +29,18 @@
       "no_value": "No",
       "default": false
     },
+    "create_post_fact": {
+      "name": "Livestream Post",
+      "yes_value": "Yes",
+      "no_value": "No",
+      "default": false
+    },
+    "post_settings": {
+      "group_id": 42,
+      "attachment_name": "Stream-Post",
+      "post_visibility": "group_visible",
+      "comments_active": true
+    },
     "thumbnail_name": "YouTube-Thumbnail",
     "speaker_service_name": "Speaker",
     "stream_attachment_name": "YouTube-Stream"

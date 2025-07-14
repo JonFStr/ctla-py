@@ -41,6 +41,7 @@ class Facts:
     visibility: YtVisibility
     link_in_cal: bool
     on_homepage: bool
+    create_post: bool
 
     @classmethod
     def from_api_json(cls, facts: dict[str, int | str]):
@@ -78,6 +79,7 @@ class Facts:
             link_in_cal=_parse_boolean_fact('include_in_cal_fact', facts),
             visibility=visibility,
             on_homepage=_parse_boolean_fact('show_on_homepage', facts),
+            create_post=_parse_boolean_fact('create_post_fact', facts)
         )
 
 

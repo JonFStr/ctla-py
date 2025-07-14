@@ -3,10 +3,11 @@ import logging
 import urllib.parse
 from collections.abc import Generator
 from datetime import timedelta
-from typing import Any
+from typing import Any, Optional
 
 import config
 from RestAPI import RestAPI
+from configs.churchtools import PostVisibility
 from .CtEvent import CtEvent
 from .EventFile import EventFile, EventFileType
 
@@ -91,36 +92,38 @@ class ChurchTools(RestAPI):
             # noinspection PyTypeChecker
             yield CtEvent.from_api_json(event, facts)
 
-    def set_stream_link(self, event: CtEvent, link: str) -> bool:
+    def attach_link(self, event: CtEvent, name: str, link: str) -> Optional[EventFile]:
         """
-        Set the YT-Stream Link for an event to the given link
+        Attach a link to an event
+
         :param event: The ChurchTools Event to set the link for
+        :param name: Name of the new attachment
         :param link: The link to be set
-        :return True, if successful
+        :return: The created Link
         """
         r = self._do_post(f'/files/service/{event.id}/link', {
-            'name': config.churchtools['stream_attachment_name'],
+            'name': name,
             'url': link
         })
 
-        log.info(f'Attaching stream link {link} to "{event.title}" ({event.id})')
+        log.info(f'Attaching link "name" ({link}) to "{event.title}" ({event.id})')
         if r.status_code != 201:
             log.error(f'Error when setting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
-            return False
+            return None
 
         # Write new link into Event object
         response_data = r.json()['data']
-        event.yt_link = EventFile(
+        return EventFile(
             id=response_data['domainId'],
             type=EventFileType.LINK,
             name=response_data['name'],
             url=response_data['fileUrl']
         )
-        return True
 
     def delete_stream_link(self, event: CtEvent) -> bool:
         """
         Delete the Stream Link from an event
+
         :param event: The event to delete the stream link from
         :return: True on success
         """
@@ -130,6 +133,99 @@ class ChurchTools(RestAPI):
             log.error(f'Error when deleting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
             return False
         return True
+
+    def create_post(
+            self,
+            group_id: int,
+            title: str,
+            content: str,
+            date: datetime.datetime,
+            visibility: PostVisibility,
+            comments_active: bool
+    ) -> Optional[int]:
+        """
+        Create a post with the given details
+
+        :param group_id: Group to post in
+        :param title: Title
+        :param content: Content
+        :param date: Date of publication
+        :param visibility: Post visibility
+        :param comments_active: Whether to allow comments
+        :return: The id of the newly created post
+        """
+        log.info(f'Creating post "{title}"')
+        r = self._do_post('/posts', {
+            'groupId': group_id,
+            'title': title,
+            'content': content,
+            'publicationDate': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'visibility': visibility,
+            'commentsActive': comments_active
+        })
+        if r.status_code != 201:
+            log.error(f'Error creating post on ChurchTools [{r.status_code} - {r.reason}]: "{r.content}"')
+            return None
+        post_id = int(r.json()['data']['id'])
+        log.debug(f'Created post with id {post_id}')
+        return post_id
+
+    def get_post(self, post_id: int) -> Optional[dict]:
+        """
+        Fetch a post from ChurchTools
+
+        :param post_id: ID of the post to get
+        :return: The post data
+        """
+        log.info(f'Fetching post {post_id}')
+        r = self._do_get(f'/posts/{post_id}')
+        if r.status_code != 200:
+            log.error(f'Could not fetch post {post_id}: [{r.status_code} - {r.reason}] "{r.content}"')
+            return None
+        return r.json()['data']
+
+    def update_post(
+            self,
+            post_id: int,
+            title: Optional[str],
+            content: Optional[str],
+            date: Optional[datetime.datetime],
+            visibility: Optional[PostVisibility],
+            comments_active: Optional[bool]
+    ):
+        """
+        Update a post with the given parameters.
+        All optional parameters may be omitted, and only set parameters will be changed.
+
+        :param post_id: ID of the post to update
+        :param title: New title
+        :param content: New content
+        :param date: New publication date
+        :param visibility: new visibility
+        :param comments_active: new comment setting
+        """
+        data = dict()
+        if title:
+            data['title'] = title
+        if content:
+            data['content'] = content
+        if date:
+            data['publicationDate'] = date.strftime('%Y-%m-%dT%H:%M:%SZ')
+        if visibility:
+            data['visibility'] = visibility
+        if comments_active is not None:
+            data['commentsActive'] = comments_active
+
+        if not data:
+            log.info('No data passed. Will not update post')
+            return
+
+        r = self._do_patch(f'/posts/{post_id}', data)
+        if r.status_code != 200:
+            log.error(f'Could not update post {post_id}: [{r.status_code} - {r.reason}] "{r.content}"')
+            return
+
+        log.info(f'Updated post {post_id}')
 
     def get_calendar_entry(self, event: CtEvent) -> dict[str, Any]:
         """

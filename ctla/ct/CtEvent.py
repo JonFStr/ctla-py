@@ -24,6 +24,7 @@ class CtEvent:
 
     yt_link: Optional[EventFile] = None
     yt_thumbnail: Optional[EventFile] = None
+    post_link: Optional[EventFile] = None
 
     @classmethod
     def from_api_json(cls, event: dict[str, typing.Any], facts: dict[str, int | str]) -> 'CtEvent':
@@ -55,6 +56,7 @@ class CtEvent:
             description=event['description'],
             isCanceled=event['isCanceled'],
             facts=Facts.from_api_json(facts),
-            yt_link=EventFile.from_event_api_json(yt_link_data) if yt_link_data is not None else None,
-            yt_thumbnail=EventFile.from_event_api_json(yt_thumb_data) if yt_thumb_data is not None else None,
+            yt_link=EventFile.from_event_api_json(yt_link_data) if yt_link_data else None,
+            yt_thumbnail=EventFile.from_event_api_json(yt_thumb_data) if yt_thumb_data else None,
+            post_link=EventFile.from_event_api_json(post_link_data) if post_link_data else None
         )

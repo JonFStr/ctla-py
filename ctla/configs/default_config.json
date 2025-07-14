@@ -15,6 +15,11 @@
       "private_value": "Private",
       "default": "Only via a link"
     },
+    "post_settings": {
+      "attachment_name": "Stream-Post",
+      "post_visibility": "group_visible",
+      "comments_active": true
+    },
     "thumbnail_name": "YouTube-Thumbnail",
     "stream_attachment_name": "YouTube-Stream"
   },

@@ -34,6 +34,13 @@ for event in events:
             update.create_youtube(ct, yt, event)
 
         update.update_youtube(yt, event)
+
+        if event.facts.create_post:
+            if not event.post_link:
+                update.create_post(ct, event)
+            else:
+                update.update_post(ct, event)
+
     else:
         delete.delete_stream(ct, yt, event)
 

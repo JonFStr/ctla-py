@@ -33,7 +33,9 @@ def create_youtube(ct: ChurchTools, yt: YouTube, event: Event):
     bc: LiveBroadcast = yt.create_broadcast(event.title, event.start_time, event.yt_visibility)
     bc = yt.bind_stream_to_broadcast(bc['id'], config.youtube['stream_key_id'])
     event.yt_broadcast = bc
-    ct.set_stream_link(event, f'https://youtu.be/{bc['id']}')
+    link_file = ct.attach_link(event, config.churchtools['stream_attachment_name'], f'https://youtu.be/{bc['id']}')
+    if link_file:
+        event.yt_link = link_file
 
 
 def _get_thumbnail_uri(title: str) -> str:
@@ -156,3 +158,56 @@ def update_wordpress(wp: WordPress, events: list[Event]):
             log.info(f'Updated page {page_id}.')
         else:
             log.error(f'Could not update page {page_id} because the content could not be inserted.')
+
+
+def create_post(ct: ChurchTools, event: Event):
+    """
+    Create a post for the given event and add it to the attachments
+    :param ct: ChurchTools API instance
+    :param event: Event to act on
+    """
+    post_id = ct.create_post(
+        group_id=config.churchtools['post_settings']['group_id'],
+        title=event.yt_title,
+        content=event.yt_link.url,
+        date=event.end_time,
+        visibility=config.churchtools['post_settings']['post_visibility'],
+        comments_active=config.churchtools['post_settings']['comments_active']
+    )
+    if post_id:
+        event.post_link = ct.attach_link(
+            event=event,
+            name=config.churchtools['post_settings']['attachment_name'],
+            link=urllib.parse.urlunsplit(('https', config.churchtools['instance'], f'/posts/{post_id}', '', ''))
+        )
+
+
+def update_post(ct: ChurchTools, event: Event):
+    """
+    Updates the Post for an event, if necessary
+
+    :param ct: ChurchTools API instance
+    :param event: Event to act on
+    """
+    try:
+        post_id = int(event.post_link.url.split('/')[-1])
+    except ValueError:
+        log.error(f'Could not parse post id from "{event.post_link.url}"')
+        return
+
+    post = ct.get_post(post_id)
+    if post:
+        title = event.yt_title
+        content = event.yt_link.url
+        date = event.end_time
+        visibility = config.churchtools['post_settings']['post_visibility']
+        comments = config.churchtools['post_settings']['comments_active']
+
+        ct.update_post(
+            post_id,
+            title=title if post['title'] != title else None,
+            content=content if post['content'] != content else None,
+            date=date if datetime.datetime.fromisoformat(post['publicationDate']) != date else None,
+            visibility=visibility if post['visibility'] != visibility else None,
+            comments_active=comments if post['commentsActive'] != comments else None
+        )

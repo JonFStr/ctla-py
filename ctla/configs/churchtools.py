@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, Literal
 
 
 class ManageStreamBehaviorConf(TypedDict):
@@ -50,6 +50,25 @@ class BooleanFactConf(TypedDict):
     """Default behavior"""
 
 
+type PostVisibility = Literal['group_visible', 'group_intern']
+"""Visibility values for posts"""
+
+
+class PostSettingsConf(TypedDict):
+    """
+    Dataclass holding configuration for the creation of posts
+    """
+
+    group_id: int
+    """ID of the ChurchTools group to post in"""
+    attachment_name: str
+    """Name of the Event attachment that will link to the created post"""
+    post_visibility: PostVisibility
+    """Visibility of the created post"""
+    comments_active: bool
+    """Whether to enable comments"""
+
+
 class ChurchToolsConf(TypedDict):
     """
     Dataclass holding configuration about ChurchTools
@@ -67,6 +86,8 @@ class ChurchToolsConf(TypedDict):
     include_in_cal_fact: Optional[BooleanFactConf]
     show_on_homepage_fact: Optional[BooleanFactConf]
     create_post_fact: Optional[BooleanFactConf]
+
+    post_settings: Optional[PostSettingsConf]
 
     speaker_service_name: Optional[str]
     """Title of the ChurchTools service name containing the speaker's name"""
