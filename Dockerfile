@@ -17,6 +17,7 @@ FROM oneshot AS cron
 
 COPY --chmod=755 <<EOF /etc/periodic/hourly/ctla.sh
 #!/bin/sh
+cd /app
 exec python /usr/src/ctla
 EOF
 
