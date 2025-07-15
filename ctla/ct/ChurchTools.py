@@ -21,6 +21,7 @@ class ChurchTools(RestAPI):
 
     token: str
     _facts_cache: dict[int, str] = None
+    _services_cache: dict[str, int] = None
 
     def __init__(self, instance: str = None, token: str = None):
         """
@@ -59,6 +60,18 @@ class ChurchTools(RestAPI):
             self._facts_cache = {fact['id']: fact['name'] for fact in r.json()['data']}
         return self._facts_cache
 
+    @property
+    def service_mdata(self) -> dict[str, int]:
+        """ChurchTools events service masterdata (name : id). Will be fetched and cached on first access."""
+        if self._services_cache is None:
+            log.info('Caching service masterdata…')
+            r = self._do_get('/services')
+            if r.status_code != 200:
+                log.error(f'Response error when fetching service masterdata [{r.status_code}]: "{r.content}"')
+
+            self._services_cache = {service['name']: service['id'] for service in r.json()['data']}
+        return self._services_cache
+
     def get_event_facts(self, event_id: int) -> dict[str, int | str] | None:
         """Get the facts for the event with id `event_id`, as dict"""
         log.info('Collecting event facts…')
@@ -81,7 +94,7 @@ class ChurchTools(RestAPI):
         to_limit = (datetime.date.today() + timedelta(days=days)).isoformat()
 
         log.info('Retrieving upcoming event data…')
-        r = self._do_get('/events', canceled=True, **{'from': from_limit}, to=to_limit)
+        r = self._do_get('/events', canceled=True, **{'from': from_limit}, to=to_limit, include='eventServices')
         if r.status_code != 200:
             log.error(f'Response error when fetching upcoming events [{r.status_code}]: "{r.content}"')
             r.raise_for_status()
@@ -89,7 +102,7 @@ class ChurchTools(RestAPI):
         for event in r.json()['data']:
             facts = self.get_event_facts(event['id'])
             # noinspection PyTypeChecker
-            yield CtEvent.from_api_json(event, facts)
+            yield CtEvent.from_api_json(event, facts, self.service_mdata)
 
     def attach_link(self, event: CtEvent, name: str, link: str) -> Optional[EventFile]:
         """
