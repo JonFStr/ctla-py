@@ -1,5 +1,8 @@
+import atexit
 import logging
 import pprint
+
+import requests
 
 import config
 import delete
@@ -20,6 +23,17 @@ ct = ChurchTools()
 yt = YouTube()
 
 events = list(setup.gather_event_info(ct, yt))
+
+clean_exit = False
+"""failure occurred during run"""
+
+
+@atexit.register
+def notify_exit():
+    """Notify external monitor in case of unclean exit"""
+    if not clean_exit and config.monitor_url:
+        requests.get(config.monitor_url.format(status='down'))
+
 
 # TODO debug statements:
 events = [ev for ev in events if ev.category_id == 30]
@@ -48,3 +62,8 @@ for event in events:
 if config.wordpress['enabled']:
     wp = WordPress()
     update.update_wordpress(wp, [ev for ev in events if ev.yt_link and ev.facts.on_homepage])
+
+if config.monitor_url:
+    requests.get(config.monitor_url.format(status='up'))
+
+clean_exit = True

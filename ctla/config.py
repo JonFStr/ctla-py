@@ -1,7 +1,7 @@
 import json
 import logging
 import os.path
-from typing import TypedDict
+from typing import TypedDict, Optional
 
 import utils
 from configs import args
@@ -19,14 +19,18 @@ class Config(TypedDict):
     churchtools: ChurchToolsConf
     youtube: YouTubeConf
     wordpress: None
+    monitor_url: Optional[str]
+    """
+    Optional monitor URL for external monitoring.
+    Can be formatted with {status} which will be filled with "up" or "down"
+    """
 
 
 # Easy access to loaded config
 churchtools: ChurchToolsConf
 youtube: YouTubeConf
 wordpress: WordPressConf
-# noinspection PyTypeChecker
-churchtools, youtube, wordpress = {}, {}, {}
+monitor_url: Optional[str]
 
 
 def filter_none[T: dict](target: T) -> T:
@@ -136,9 +140,10 @@ def load():
     # Load CLI parameters
     utils.combine_into(_load_cli_params(), config)
 
-    global churchtools, youtube, wordpress
+    global churchtools, youtube, wordpress, monitor_url
     churchtools = config['churchtools']
     youtube = config['youtube']
     wordpress = config['wordpress']
+    monitor_url = config.get('monitor_url', None)
 
     log.info('Configuration loaded.')

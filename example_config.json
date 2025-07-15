@@ -94,5 +94,6 @@
     "content_templates": {
       "livestream-links": "<a href=\"${video_link}\">${title} on ${datetime}</a>\n"
     }
-  }
+  },
+  "monitor_url": "https://monitor.yourchurch.de/api/push/pushtoken?status={status}"
 }
