@@ -47,28 +47,27 @@ class ChurchTools(RestAPI):
 
         log.info('Initialized ChurchTools API.')
 
-    def cache_facts(self):
-        """Cache the fact masterdata in this instance. Do nothing if cache exists"""
-        if self._facts_cache is not None:
-            return
-        log.info('Caching fact masterdata…')
-        r = self._do_get('/facts')
-        if r.status_code != 200:
-            log.error(f'Response error when fetching fact masterdata [{r.status_code}]: "{r.content}"')
+    @property
+    def fact_mdata(self) -> dict[int, str]:
+        """ChurchTools Facts masterdata (id : name). Will be fetched and cached on first access."""
+        if self._facts_cache is None:
+            log.info('Caching fact masterdata…')
+            r = self._do_get('/facts')
+            if r.status_code != 200:
+                log.error(f'Response error when fetching fact masterdata [{r.status_code}]: "{r.content}"')
 
-        self._facts_cache = {fact['id']: fact['name'] for fact in r.json()['data']}
+            self._facts_cache = {fact['id']: fact['name'] for fact in r.json()['data']}
+        return self._facts_cache
 
     def get_event_facts(self, event_id: int) -> dict[str, int | str] | None:
         """Get the facts for the event with id `event_id`, as dict"""
-        self.cache_facts()
-
         log.info('Collecting event facts…')
         r = self._do_get(f'/events/{event_id}/facts')
         if r.status_code != 200:
             log.error(f'Response error when fetching facts for {event_id} [{r.status_code}]: "{r.content}"')
             return None
 
-        return {self._facts_cache[fact['factId']]: fact['value'] for fact in r.json()['data']}
+        return {self.fact_mdata[fact['factId']]: fact['value'] for fact in r.json()['data']}
 
     def get_upcoming_events(self, days: int) -> Generator[CtEvent]:
         """
