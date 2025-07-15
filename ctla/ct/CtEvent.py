@@ -17,7 +17,7 @@ class CtEvent:
     start_time: datetime
     end_time: datetime
     title: str
-    description: str
+    note: str
     isCanceled: bool
 
     facts: Facts
@@ -53,7 +53,7 @@ class CtEvent:
             start_time=datetime.fromisoformat(event['startDate']),
             end_time=datetime.fromisoformat(event['endDate']),
             title=event['name'],
-            description=event['description'],
+            note=event['note'],
             isCanceled=event['isCanceled'],
             facts=Facts.from_api_json(facts),
             yt_link=EventFile.from_event_api_json(yt_link_data) if yt_link_data else None,

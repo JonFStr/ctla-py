@@ -21,7 +21,10 @@
       "comments_active": true
     },
     "thumbnail_name": "YouTube-Thumbnail",
-    "stream_attachment_name": "YouTube-Stream"
+    "stream_attachment_name": "YouTube-Stream",
+    "templates": {
+      "datetime_format": "%d.%m.%Y"
+    }
   },
   "youtube": {
     "redirect_url": "http://localhost:8080/",
@@ -30,8 +33,7 @@
     "credentials_file": "youtube_credentials.json",
     "templates": {
       "title": "${title} on ${start}",
-      "description": "Livestream from our church",
-      "dateformat": "%d.%m.%Y"
+      "description": "Livestream from our church"
     },
     "broadcast_settings": {
       "enable_monitor_stream": true,
@@ -52,7 +54,6 @@
     "pages": {},
     "content_tag": "ct-livestreams",
     "wpbakery_compat": false,
-    "content_templates": {},
-    "datetime_format": "%d.%m.%Y"
+    "content_templates": {}
   }
 }

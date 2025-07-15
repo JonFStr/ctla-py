@@ -8,18 +8,16 @@ class YouTubeTemplateConf(TypedDict):
     The templates use ${}-substitutions. Valid substitutions are:
     - title
     - description
-    - start (formatted with `dateformat`)
-    - end (formatted with `dateformat`)
+    - start (formatted with `churchtools.templates.dateformat`)
+    - end (formatted with `churchtools.templates.dateformat`)
 
     Attributes:
 
     - `title`: Template for the title
     - `description`: Template for the broadcast description
-    - `dateformat`: Template understood by `datetime.strftime()`, used to format dates
     """
     title: str
     description: str
-    dateformat: str
 
 
 class YouTubeBroadcastSettingsConf(TypedDict):

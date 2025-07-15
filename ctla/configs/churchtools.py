@@ -69,6 +69,14 @@ class PostSettingsConf(TypedDict):
     """Whether to enable comments"""
 
 
+class ChurchToolsTemplateConf(TypedDict):
+    """
+    Dataclass for templates regarding ChurchTools data
+    """
+    dateformat: str
+    """String understood by ``datetime.strftime``` to format dates"""
+
+
 class ChurchToolsConf(TypedDict):
     """
     Dataclass holding configuration about ChurchTools
@@ -95,3 +103,6 @@ class ChurchToolsConf(TypedDict):
     """Name of the service attachment containing the streams Thumbnail"""
     stream_attachment_name: str
     """Name of the service attachment pointing to the YouTube stream"""
+
+    templates: ChurchToolsTemplateConf
+    """Template configurations"""

@@ -62,13 +62,13 @@ class Event(CtEvent):
 
     @property
     def formatted_start(self) -> str:
-        """Start datetime, formatted according to config.youtube.templates.dateformat"""
-        return self.start_time.strftime(config.youtube['templates']['dateformat'])
+        """Start datetime, formatted according to config.churchtools.templates.dateformat"""
+        return self.start_time.strftime(config.churchtools['templates']['dateformat'])
 
     @property
     def formatted_end(self) -> str:
-        """End datetime, formatted according to config.youtube.templates.dateformat"""
-        return self.end_time.strftime(config.youtube['templates']['dateformat'])
+        """End datetime, formatted according to config.churchtools.templates.dateformat"""
+        return self.end_time.strftime(config.churchtools['templates']['dateformat'])
 
     @property
     def yt_title(self) -> str:
@@ -85,7 +85,7 @@ class Event(CtEvent):
         """Pack the variables available in templates into one dict"""
         return dict(
             title=self.title,
-            description=self.description,
+            note=self.note,
             start=self.formatted_start,
             end=self.formatted_end
         )

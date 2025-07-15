@@ -127,7 +127,7 @@ def _render_templates(events: list[Event]) -> dict[str, str]:
                 'pre_iso': pre_time.isoformat(),
                 'start_iso': event.start_time.isoformat(),
                 'end_iso': event.end_time.isoformat(),
-                'datetime': event.start_time.strftime(config.wordpress['datetime_format']),
+                'datetime': event.start_time.strftime(config.churchtools['templates']['dateformat']),
                 'video_link': event.yt_link.url,
                 'video_link_quoted': urllib.parse.quote(event.yt_link.url)
             }) + '\n'

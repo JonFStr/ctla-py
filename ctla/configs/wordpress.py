@@ -50,16 +50,10 @@ class WordPressConf(TypedDict):
     - pre_iso  -- ISO format of when this event will start to be included
     - start_iso  -- ISO format of when this event will start
     - end_iso  -- ISO format of when this event will end
-    - datetime  -- Start time formatted according to :py:attr:`datetime_format`
+    - datetime  -- Start time formatted according to ``churchtools.templates.dateformat``
     - video_link  -- Link to the YouTube video
     - video_link_quoted -- Link to the YouTube video quoted with ``urllib.parse.quote``
     
     It is recommended to use the `Timed Content <https://wordpress.org/plugins/timed-content/>`__ plugin
     or something similar to select when the different streams are displayed
-    """
-    datetime_format: str
-    """
-    Format string for the ``datetime`` variable in :py:attr:`content_templates`.
-    
-    Must be compatible with ``datetime.datetime.strptime()``
     """
