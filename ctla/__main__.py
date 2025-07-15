@@ -1,6 +1,7 @@
 import atexit
 import logging
 import pprint
+import time
 
 import requests
 
@@ -12,6 +13,14 @@ from configs import args
 from ct.ChurchTools import ChurchTools
 from wp.WordPress import WordPress
 from yt.YouTube import YouTube
+
+start_time = time.time()
+
+
+def elapsed_ms() -> int:
+    """Program runtime, in ms"""
+    return int((time.time() - start_time) * 1000)
+
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -32,7 +41,7 @@ clean_exit = False
 def notify_exit():
     """Notify external monitor in case of unclean exit"""
     if not clean_exit and config.monitor_url:
-        requests.get(config.monitor_url.format(status='down', msg='Something went wrong.'))
+        requests.get(config.monitor_url.format(status='down', msg='Something went wrong.', ping=elapsed_ms()))
 
 
 log.debug(pprint.pformat(events))
@@ -62,6 +71,6 @@ if config.wordpress['enabled']:
     update.update_wordpress(wp, [ev for ev in events if ev.yt_link and ev.facts.on_homepage])
 
 if config.monitor_url:
-    requests.get(config.monitor_url.format(status='up', msg='OK'))
+    requests.get(config.monitor_url.format(status='up', msg='OK', ping=elapsed_ms()))
 
 clean_exit = True
