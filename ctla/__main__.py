@@ -13,7 +13,7 @@ from ct.ChurchTools import ChurchTools
 from wp.WordPress import WordPress
 from yt.YouTube import YouTube
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 args.parse()
@@ -35,9 +35,7 @@ def notify_exit():
         requests.get(config.monitor_url.format(status='down', msg='Something went wrong.'))
 
 
-# TODO debug statements:
-events = [ev for ev in events if ev.category_id == 30]
-log.info(pprint.pformat(events))
+log.debug(pprint.pformat(events))
 
 for event in events:
     if event.wants_stream:
