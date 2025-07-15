@@ -1,6 +1,5 @@
 import logging
 import urllib.parse
-from typing import Optional
 
 import config
 from RestAPI import RestAPI
@@ -37,7 +36,7 @@ class WordPress(RestAPI):
 
         log.info('Initialized WordPress API.')
 
-    def get_page(self, page_id: int) -> Optional[WordPressPage]:
+    def get_page(self, page_id: int) -> WordPressPage:
         """
         Retrieve a page from WordPress
 
@@ -48,7 +47,7 @@ class WordPress(RestAPI):
         r = self._do_get(f'/pages/{page_id}', context='edit')
         if r.status_code != 200:
             log.error(f'Could not fetch wordpress pages: {r.reason}')
-            return None
+            r.raise_for_status()
 
         return r.json()
 
@@ -63,3 +62,4 @@ class WordPress(RestAPI):
         r = self._do_post(f'/pages/{page_id}', page)
         if r.status_code != 200:
             log.error(f'Could not update page {page_id}: {r.reason}')
+            r.raise_for_status()

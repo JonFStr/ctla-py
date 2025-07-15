@@ -158,6 +158,7 @@ def update_wordpress(wp: WordPress, events: list[Event]):
             log.info(f'Updated page {page_id}.')
         else:
             log.error(f'Could not update page {page_id} because the content could not be inserted.')
+            raise RuntimeError
 
 
 def create_post(ct: ChurchTools, event: Event):
@@ -174,12 +175,11 @@ def create_post(ct: ChurchTools, event: Event):
         visibility=config.churchtools['post_settings']['post_visibility'],
         comments_active=config.churchtools['post_settings']['comments_active']
     )
-    if post_id:
-        event.post_link = ct.attach_link(
-            event=event,
-            name=config.churchtools['post_settings']['attachment_name'],
-            link=urllib.parse.urlunsplit(('https', config.churchtools['instance'], f'/posts/{post_id}', '', ''))
-        )
+    event.post_link = ct.attach_link(
+        event=event,
+        name=config.churchtools['post_settings']['attachment_name'],
+        link=urllib.parse.urlunsplit(('https', config.churchtools['instance'], f'/posts/{post_id}', '', ''))
+    )
 
 
 def update_post(ct: ChurchTools, event: Event):
@@ -193,21 +193,21 @@ def update_post(ct: ChurchTools, event: Event):
         post_id = int(event.post_link.url.split('/')[-1])
     except ValueError:
         log.error(f'Could not parse post id from "{event.post_link.url}"')
-        return
+        raise RuntimeError
 
     post = ct.get_post(post_id)
-    if post:
-        title = event.post_title
-        content = event.post_content
-        date = event.end_time
-        visibility = config.churchtools['post_settings']['post_visibility']
-        comments = config.churchtools['post_settings']['comments_active']
 
-        ct.update_post(
-            post_id,
-            title=title if post['title'] != title else None,
-            content=content if post['content'] != content else None,
-            date=date if datetime.datetime.fromisoformat(post['publicationDate']) != date else None,
-            visibility=visibility if post['visibility'] != visibility else None,
-            comments_active=comments if post['commentsActive'] != comments else None
-        )
+    title = event.post_title
+    content = event.post_content
+    date = event.end_time
+    visibility = config.churchtools['post_settings']['post_visibility']
+    comments = config.churchtools['post_settings']['comments_active']
+
+    ct.update_post(
+        post_id,
+        title=title if post['title'] != title else None,
+        content=content if post['content'] != content else None,
+        date=date if datetime.datetime.fromisoformat(post['publicationDate']) != date else None,
+        visibility=visibility if post['visibility'] != visibility else None,
+        comments_active=comments if post['commentsActive'] != comments else None
+    )

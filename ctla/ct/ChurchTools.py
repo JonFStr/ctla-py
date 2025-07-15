@@ -56,6 +56,7 @@ class ChurchTools(RestAPI):
             r = self._do_get('/facts')
             if r.status_code != 200:
                 log.error(f'Response error when fetching fact masterdata [{r.status_code}]: "{r.content}"')
+                r.raise_for_status()
 
             self._facts_cache = {fact['id']: fact['name'] for fact in r.json()['data']}
         return self._facts_cache
@@ -68,17 +69,18 @@ class ChurchTools(RestAPI):
             r = self._do_get('/services')
             if r.status_code != 200:
                 log.error(f'Response error when fetching service masterdata [{r.status_code}]: "{r.content}"')
+                r.raise_for_status()
 
             self._services_cache = {service['name']: service['id'] for service in r.json()['data']}
         return self._services_cache
 
-    def get_event_facts(self, event_id: int) -> dict[str, int | str] | None:
+    def get_event_facts(self, event_id: int) -> dict[str, int | str]:
         """Get the facts for the event with id `event_id`, as dict"""
         log.info('Collecting event facts…')
         r = self._do_get(f'/events/{event_id}/facts')
         if r.status_code != 200:
             log.error(f'Response error when fetching facts for {event_id} [{r.status_code}]: "{r.content}"')
-            return None
+            r.raise_for_status()
 
         return {self.fact_mdata[fact['factId']]: fact['value'] for fact in r.json()['data']}
 
@@ -121,7 +123,7 @@ class ChurchTools(RestAPI):
         log.info(f'Attaching link "name" ({link}) to "{event.title}" ({event.id})')
         if r.status_code != 201:
             log.error(f'Error when setting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
-            return None
+            r.raise_for_status()
 
         # Write new link into Event object
         response_data = r.json()['data']
@@ -132,19 +134,17 @@ class ChurchTools(RestAPI):
             url=response_data['fileUrl']
         )
 
-    def delete_stream_link(self, event: CtEvent) -> bool:
+    def delete_stream_link(self, event: CtEvent):
         """
         Delete the Stream Link from an event
 
         :param event: The event to delete the stream link from
-        :return: True on success
         """
         log.info(f'Deleting stream link from "{event.title}" ({event.id})')
         r = self._do_delete(f'/files/{event.yt_link.id}')
         if r.status_code != 204:
             log.error(f'Error when deleting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
-            return False
-        return True
+            r.raise_for_status()
 
     def create_post(
             self,
@@ -154,7 +154,7 @@ class ChurchTools(RestAPI):
             date: datetime.datetime,
             visibility: PostVisibility,
             comments_active: bool
-    ) -> Optional[int]:
+    ) -> int:
         """
         Create a post with the given details
 
@@ -177,12 +177,12 @@ class ChurchTools(RestAPI):
         })
         if r.status_code != 201:
             log.error(f'Error creating post on ChurchTools [{r.status_code} - {r.reason}]: "{r.content}"')
-            return None
+            r.raise_for_status()
         post_id = int(r.json()['data']['id'])
         log.debug(f'Created post with id {post_id}')
         return post_id
 
-    def get_post(self, post_id: int) -> Optional[dict]:
+    def get_post(self, post_id: int) -> dict:
         """
         Fetch a post from ChurchTools
 
@@ -193,7 +193,7 @@ class ChurchTools(RestAPI):
         r = self._do_get(f'/posts/{post_id}')
         if r.status_code != 200:
             log.error(f'Could not fetch post {post_id}: [{r.status_code} - {r.reason}] "{r.content}"')
-            return None
+            r.raise_for_status()
         return r.json()['data']
 
     def update_post(
@@ -235,7 +235,7 @@ class ChurchTools(RestAPI):
         r = self._do_patch(f'/posts/{post_id}', data)
         if r.status_code != 200:
             log.error(f'Could not update post {post_id}: [{r.status_code} - {r.reason}] "{r.content}"')
-            return
+            r.raise_for_status()
 
         log.info(f'Updated post {post_id}')
 
