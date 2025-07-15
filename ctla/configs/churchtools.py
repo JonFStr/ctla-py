@@ -69,12 +69,22 @@ class PostSettingsConf(TypedDict):
     """Whether to enable comments"""
 
 
+class SpeakerTemplateConf(TypedDict):
+    """Templates to embed the ``${name}`` of the speaker into"""
+    short: str
+    """Short format, e.g. for use in titles"""
+    long: str
+    """Long format, e.g. for use in descriptions"""
+
+
 class ChurchToolsTemplateConf(TypedDict):
     """
     Dataclass for templates regarding ChurchTools data
     """
     dateformat: str
     """String understood by ``datetime.strftime``` to format dates"""
+    speaker: SpeakerTemplateConf
+    """Templates for including the speaker's name"""
 
 
 class ChurchToolsConf(TypedDict):

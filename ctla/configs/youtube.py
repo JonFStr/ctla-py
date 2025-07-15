@@ -7,9 +7,11 @@ class YouTubeTemplateConf(TypedDict):
 
     The templates use ${}-substitutions. Valid substitutions are:
     - title
-    - description
+    - note
     - start (formatted with `churchtools.templates.dateformat`)
     - end (formatted with `churchtools.templates.dateformat`)
+    - speaker_s
+    - speaker_l
 
     Attributes:
 

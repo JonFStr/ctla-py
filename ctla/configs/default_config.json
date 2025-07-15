@@ -23,7 +23,11 @@
     "thumbnail_name": "YouTube-Thumbnail",
     "stream_attachment_name": "YouTube-Stream",
     "templates": {
-      "datetime_format": "%d.%m.%Y"
+      "datetime_format": "%d.%m.%Y",
+      "speaker": {
+        "short": "with ${name}",
+        "long": "Speaker: ${name}"
+      }
     }
   },
   "youtube": {

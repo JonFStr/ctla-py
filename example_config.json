@@ -45,7 +45,11 @@
     "speaker_service_name": "Speaker",
     "stream_attachment_name": "YouTube-Stream",
     "templates": {
-      "dateformat": "%d.%m.%Y"
+      "dateformat": "%d.%m.%Y",
+      "speaker": {
+        "short": " - with ${name}",
+        "long": "\nSpeaker: ${name}"
+      }
     }
   },
   "youtube": {
@@ -54,8 +58,8 @@
     "client_secrets_file": "client_secrets.json",
     "credentials_file": "youtube_credentials.json",
     "templates": {
-      "title": "${title} on ${start}",
-      "description": "Livestream from our church"
+      "title": "${title} on ${start}${speaker_s}",
+      "description": "Livestream from our church${speaker_l}"
     },
     "stream_key_id": "STREAM_KEY_ID_HERE",
     "default_thumbnail_uri": "https://http.cat/404.jpg",

@@ -61,16 +61,6 @@ class Event(CtEvent):
                 return 'private'
 
     @property
-    def formatted_start(self) -> str:
-        """Start datetime, formatted according to config.churchtools.templates.dateformat"""
-        return self.start_time.strftime(config.churchtools['templates']['dateformat'])
-
-    @property
-    def formatted_end(self) -> str:
-        """End datetime, formatted according to config.churchtools.templates.dateformat"""
-        return self.end_time.strftime(config.churchtools['templates']['dateformat'])
-
-    @property
     def yt_title(self) -> str:
         """Apply the YouTube title template configured"""
         return Template(config.youtube['templates']['title']).safe_substitute(**self._substitution_vars)
@@ -83,11 +73,20 @@ class Event(CtEvent):
     @property
     def _substitution_vars(self) -> dict[str, str]:
         """Pack the variables available in templates into one dict"""
+        fmt_start = self.start_time.strftime(config.churchtools['templates']['dateformat'])
+        fmt_end = self.end_time.strftime(config.churchtools['templates']['dateformat'])
+
+        spkr_tmplt = config.churchtools['templates']['speaker']
+        speaker_short = Template(spkr_tmplt['short']).safe_substitute(name=self.speaker) if self.speaker else ''
+        speaker_long = Template(spkr_tmplt['long']).safe_substitute(name=self.speaker) if self.speaker else ''
+
         return dict(
             title=self.title,
             note=self.note,
-            start=self.formatted_start,
-            end=self.formatted_end
+            start=fmt_start,
+            end=fmt_end,
+            speaker_s=speaker_short,
+            speaker_l=speaker_long
         )
 
 
