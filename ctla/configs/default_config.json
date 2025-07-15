@@ -18,7 +18,8 @@
     "post_settings": {
       "attachment_name": "Stream-Post",
       "post_visibility": "group_visible",
-      "comments_active": true
+      "comments_active": true,
+      "content": "${link}"
     },
     "thumbnail_name": "YouTube-Thumbnail",
     "stream_attachment_name": "YouTube-Stream",

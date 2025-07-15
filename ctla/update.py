@@ -168,8 +168,8 @@ def create_post(ct: ChurchTools, event: Event):
     """
     post_id = ct.create_post(
         group_id=config.churchtools['post_settings']['group_id'],
-        title=event.yt_title,
-        content=event.yt_link.url,
+        title=event.post_title,
+        content=event.post_content,
         date=event.end_time,
         visibility=config.churchtools['post_settings']['post_visibility'],
         comments_active=config.churchtools['post_settings']['comments_active']
@@ -197,8 +197,8 @@ def update_post(ct: ChurchTools, event: Event):
 
     post = ct.get_post(post_id)
     if post:
-        title = event.yt_title
-        content = event.yt_link.url
+        title = event.post_title
+        content = event.post_content
         date = event.end_time
         visibility = config.churchtools['post_settings']['post_visibility']
         comments = config.churchtools['post_settings']['comments_active']

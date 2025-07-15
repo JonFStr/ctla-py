@@ -63,12 +63,31 @@ class Event(CtEvent):
     @property
     def yt_title(self) -> str:
         """Apply the YouTube title template configured"""
-        return Template(config.youtube['templates']['title']).safe_substitute(**self._substitution_vars)
+        return Template(config.youtube['templates']['title']).safe_substitute(**self._substitution_vars).strip()
 
     @property
     def yt_description(self) -> str:
         """Apply the YouTube description template configured"""
-        return Template(config.youtube['templates']['description']).safe_substitute(**self._substitution_vars)
+        return Template(config.youtube['templates']['description']).safe_substitute(**self._substitution_vars).strip()
+
+    @property
+    def post_title(self) -> str:
+        """Apply the post title template configured"""
+        return Template(
+            config.churchtools['post_settings']
+            .get('title', config.youtube['templates']['title'])
+        ).safe_substitute(
+            **self._substitution_vars | {'link': self.yt_link.url}
+        ).strip()
+
+    @property
+    def post_content(self) -> str:
+        """Apply the post description template configured"""
+        return Template(
+            config.churchtools['post_settings']['content']
+        ).safe_substitute(
+            **self._substitution_vars | {'link': self.yt_link.url}
+        ).strip()
 
     @property
     def _substitution_vars(self) -> dict[str, str]:

@@ -39,7 +39,9 @@
       "group_id": 42,
       "attachment_name": "Stream-Post",
       "post_visibility": "group_visible",
-      "comments_active": true
+      "comments_active": true,
+      "title": "${title} on ${start}${speaker_s}",
+      "description": "${link}"
     },
     "thumbnail_name": "YouTube-Thumbnail",
     "speaker_service_name": "Speaker",

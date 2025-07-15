@@ -67,6 +67,10 @@ class PostSettingsConf(TypedDict):
     """Visibility of the created post"""
     comments_active: bool
     """Whether to enable comments"""
+    title: Optional[str]
+    """Optional template for the Post's title. If emtpy, the YouTube title will be used"""
+    content: str
+    """Template for the post's content"""
 
 
 class SpeakerTemplateConf(TypedDict):
