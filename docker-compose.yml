@@ -1,0 +1,7 @@
+services:
+  ctla:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: cron
+    restart: unless-stopped

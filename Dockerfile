@@ -1,4 +1,5 @@
-FROM python:3
+# Base image, runs once and exits
+FROM python:3-alpine AS oneshot
 LABEL authors="Jonathan Straub"
 
 WORKDIR /app
@@ -10,3 +11,13 @@ RUN pip install --no-cache-dir -r requirements.txt  \
 COPY ./ctla /usr/src/ctla
 
 ENTRYPOINT ["python", "/usr/src/ctla"]
+
+# Extension: run hourly as cron job
+FROM oneshot AS cron
+
+COPY --chmod=755 <<EOF /etc/periodic/hourly/ctla.sh
+#!/bin/sh
+exec python /usr/src/ctla
+EOF
+
+ENTRYPOINT ["crond", "-f"]
