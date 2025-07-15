@@ -32,7 +32,7 @@ clean_exit = False
 def notify_exit():
     """Notify external monitor in case of unclean exit"""
     if not clean_exit and config.monitor_url:
-        requests.get(config.monitor_url.format(status='down'))
+        requests.get(config.monitor_url.format(status='down', msg='Something went wrong.'))
 
 
 # TODO debug statements:
@@ -64,6 +64,6 @@ if config.wordpress['enabled']:
     update.update_wordpress(wp, [ev for ev in events if ev.yt_link and ev.facts.on_homepage])
 
 if config.monitor_url:
-    requests.get(config.monitor_url.format(status='up'))
+    requests.get(config.monitor_url.format(status='up', msg='OK'))
 
 clean_exit = True

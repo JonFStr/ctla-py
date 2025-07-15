@@ -22,7 +22,8 @@ class Config(TypedDict):
     monitor_url: Optional[str]
     """
     Optional monitor URL for external monitoring.
-    Can be formatted with {status} which will be filled with "up" or "down"
+    Can be formatted with {status} (which will be filled with "up" or "down")
+    and {msg} (which just receives a generic message)
     """
 
 
