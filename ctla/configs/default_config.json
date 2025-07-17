@@ -50,7 +50,8 @@
       "latency_preference": "low",
       "enable_auto_start": false,
       "enable_auto_stop": false
-    }
+    },
+    "thumbnail_cache": "ctla-thumbnails"
   },
   "wordpress": {
     "enabled": false,

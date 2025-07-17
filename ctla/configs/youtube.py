@@ -78,3 +78,8 @@ class YouTubeConf(TypedDict):
     """The identifier of the stream key to use (not the key itself!)"""
     broadcast_settings: YouTubeBroadcastSettingsConf
     """Setting to apply to newly created broadcasts"""
+    thumbnail_cache: str
+    """
+    Filename of a temporary file caching thumbnail information to avoid hitting YouTube rate limits.
+    May be absolute, otherwise relative to ``tempfile.gettempdir()``
+    """

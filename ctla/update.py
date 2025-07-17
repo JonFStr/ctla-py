@@ -1,11 +1,16 @@
 """
 Update functions: create & update events, broadcasts, stuff
 """
+import atexit
 import datetime
 import logging
 import operator
+import tempfile
 import urllib.parse
+from collections.abc import MutableMapping
+from pathlib import Path
 from string import Template
+from typing import ClassVar
 from zoneinfo import ZoneInfo
 
 import config
@@ -17,6 +22,64 @@ from yt.YouTube import YouTube
 from yt.type_hints import LiveBroadcast
 
 log = logging.getLogger(__name__)
+
+
+class ThumbnailCache(MutableMapping):
+    """Singleton class managing the caching of thumbnail information to avoid hitting YouTube API ratelimits"""
+
+    _instance: ClassVar['ThumbnailCache']
+    """Singleton instance"""
+
+    _cache_dict: dict[str, str] = {}
+    """Thumbnail cache: YouTube ID -> Thumbnail URI"""
+    _accessed_keys: set[str] = set()
+    """
+    Stores keys that have been accessed during the lifetime of this cache.
+    Only those keys will be written back when saving
+    """
+
+    def __new__(cls):
+        """Implement the singleton pattern"""
+        if not hasattr(cls, '_instance'):
+            cls._instance = super(ThumbnailCache, cls).__new__(cls)
+            # Load the cache
+            if cls._instance._thumbs_filename.exists():
+                cls._instance._cache_dict = dict(
+                    line.split('|', maxsplit=1)
+                    for line in cls._instance._thumbs_filename.read_text().splitlines()
+                    if line
+                )
+            log.info(f'Loaded cached thumbnail information for {len(cls._instance._cache_dict)} broadcasts')
+            # Setup saving
+            atexit.register(cls._instance._save_cache)
+        return cls._instance
+
+    def _save_cache(self):
+        self._thumbs_filename.write_text('\n'.join(f'{k}|{v}' for k, v in self._cache_dict.items()))
+        log.info(f'Saved thumbnail information for {len(self._cache_dict)} broadcasts in {self._thumbs_filename}')
+
+    @property
+    def _thumbs_filename(self) -> Path:
+        """return the configured path for the thumbnail cache"""
+        return Path(tempfile.gettempdir()).joinpath(config.youtube['thumbnail_cache'])
+
+    def __getitem__(self, item):
+        self._accessed_keys.add(item)
+        return self._cache_dict[item]
+
+    def __delitem__(self, key, /):
+        self._accessed_keys.remove(key)
+        del self._cache_dict[key]
+
+    def __len__(self):
+        return len(self._cache_dict)
+
+    def __iter__(self):
+        return iter(self._cache_dict)
+
+    def __setitem__(self, key, value, /):
+        self._accessed_keys.add(key)
+        self._cache_dict[key] = value
 
 
 def create_youtube(ct: ChurchTools, yt: YouTube, event: Event):
@@ -71,7 +134,7 @@ def update_youtube(yt: YouTube, ev: Event):
         data['title'] = yt_title
 
     yt_desc = ev.yt_description
-    if yt_desc != bc_snippet.get('title'):
+    if yt_desc != bc_snippet.get('description'):
         data['desc'] = yt_desc
 
     start_str = bc_snippet.get('scheduledStartTime')
@@ -85,8 +148,20 @@ def update_youtube(yt: YouTube, ev: Event):
     if ev.yt_visibility != bc['status']['privacyStatus']:
         data['privacy'] = ev.yt_visibility
 
-    bc = yt.set_broadcast_info(bc, **data)
-    bc = yt.set_thumbnails(bc, ev.yt_thumbnail.url if ev.yt_thumbnail else _get_thumbnail_uri(ev.title))
+    if data:
+        bc = yt.set_broadcast_info(bc, **data)
+
+    # "instantiation" happens only once, because singleton
+    thumbs_cache = ThumbnailCache()
+    yt_id = ev.yt_broadcast['id']
+
+    target_thumbnail = ev.yt_thumbnail.url if ev.yt_thumbnail else _get_thumbnail_uri(ev.title)
+    if thumbs_cache.get(yt_id, '') == target_thumbnail:
+        log.info(f'Thumbnail for "{yt_id} has not changed, not setting thumbnail "{target_thumbnail}".')
+    else:
+        bc = yt.set_thumbnails(bc, target_thumbnail)
+        thumbs_cache[yt_id] = target_thumbnail
+
     ev.yt_broadcast = bc
 
 
@@ -145,7 +220,7 @@ def update_wordpress(wp: WordPress, events: list[Event]):
     :param events: The list of events to display in WordPress
     """
     rendered_templates = _render_templates(events)
-    log.info(f'Adding {len(events)} to WordPress pages…')
+    log.info(f'Adding {len(events)} broadcast(s) to WordPress pages…')
 
     # Update all pages
     for page_id, template_key in config.wordpress.get('pages', {}).items():
@@ -154,6 +229,9 @@ def update_wordpress(wp: WordPress, events: list[Event]):
         new_page = WordPressPage.insert_content(page, rendered_templates[template_key])
 
         if new_page:
+            if new_page['content']['raw'] == page['content']['raw']:
+                log.info(f'Did not update page {page_id} because the content did not change.')
+                return
             wp.update_page(page_id, new_page)
             log.info(f'Updated page {page_id}.')
         else:
