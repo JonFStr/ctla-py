@@ -16,7 +16,8 @@ class WordPressConf(TypedDict):
     """
     Application password for the :py:attr:`user`.
     
-    (set from the `Application Password <https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/>`__)
+    (set from the
+    `Application Password <https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/>`__)
     """
     hours_to_show_in_advance: int
     """At how many hours before the event the ``pre_iso`` variable should be set to"""

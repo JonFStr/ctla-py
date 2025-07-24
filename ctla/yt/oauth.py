@@ -44,6 +44,7 @@ def load_credentials() -> Credentials | None:
     if os.path.exists(cred_path):
         with open(cred_path, 'r') as cred_file:
             return Credentials(**json.load(cred_file))
+    return None
 
 
 # helper variables for passing information between callback and main app flow

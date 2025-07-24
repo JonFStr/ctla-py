@@ -74,6 +74,7 @@ def _load_user_config() -> Config:
     return json.load(args.parsed.config)
 
 
+# noinspection PyTypeChecker
 def _load_env_config() -> Config:
     """
     Load known environment variables into a Config dict and return it.
@@ -118,6 +119,7 @@ def _load_cli_params() -> Config:
     return {}  # currently nothing is configurable via cli
 
 
+# noinspection PyTypeChecker
 def load():
     """
     Load the configuration in the following order (later takes precedence):

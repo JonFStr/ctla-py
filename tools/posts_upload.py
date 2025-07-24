@@ -161,4 +161,4 @@ def upload_youtube_posts(group_id: int, targets: list[Post]):
 # remaining = upload_youtube_posts(408, posts)
 #
 # if remaining:
-#     Path('posts_json/remaining_youtube.json').write_text(Post.schema().dumps(remaining, many=True, ensure_ascii=False))
+#    Path('posts_json/remaining_youtube.json').write_text(Post.schema().dumps(remaining, many=True, ensure_ascii=False))

@@ -167,6 +167,7 @@ class YouTube:
         log.info('Updating broadcast "%s"', broadcast['id'])
         log.debug('Setting broadcast information to %s', repr(body))
         result = self._live_broadcasts.update(part=','.join(parts_to_update), body=body).execute()
+        # noinspection PyTypeChecker
         utils.combine_into(result, broadcast)
         return broadcast
 
@@ -206,6 +207,7 @@ class YouTube:
             response: HTTPResponse = urllib.request.urlopen(thumbnail_uri)
             file = tempfile.TemporaryFile()
             mime = response.headers.get_content_type()
+            # noinspection PyTypeChecker
             shutil.copyfileobj(response, file)
             message = 'from remote URL ' + thumbnail_uri
 
