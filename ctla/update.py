@@ -231,7 +231,7 @@ def update_wordpress(wp: WordPress, events: list[Event]):
         if new_page:
             if new_page['content']['raw'] == page['content']['raw']:
                 log.info(f'Did not update page {page_id} because the content did not change.')
-                return
+                continue
             wp.update_page(page_id, new_page)
             log.info(f'Updated page {page_id}.')
         else:
