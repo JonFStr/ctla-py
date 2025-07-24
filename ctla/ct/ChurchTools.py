@@ -134,16 +134,16 @@ class ChurchTools(RestAPI):
             url=response_data['fileUrl']
         )
 
-    def delete_stream_link(self, event: CtEvent):
+    def delete_link(self, link_id: int):
         """
         Delete the Stream Link from an event
 
-        :param event: The event to delete the stream link from
+        :param link_id: The link to remove from the event
         """
-        log.info(f'Deleting stream link from "{event.title}" ({event.id})')
-        r = self._do_delete(f'/files/{event.yt_link.id}')
+        log.info(f'Deleting event link {link_id}')
+        r = self._do_delete(f'/files/{link_id}')
         if r.status_code != 204:
-            log.error(f'Error when deleting stream link on ChurchTools [{r.status_code}]: "{r.content}"')
+            log.error(f'Error when deleting event link on ChurchTools [{r.status_code}]: "{r.content}"')
             r.raise_for_status()
 
     def create_post(

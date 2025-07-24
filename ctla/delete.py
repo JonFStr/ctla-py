@@ -13,4 +13,4 @@ def delete_stream(ct: ChurchTools, yt: YouTube, ev: Event):
         yt.delete_broadcast(ev.yt_broadcast['id'])
         ev.yt_broadcast = None
     if ev.yt_link:
-        ct.delete_stream_link(ev)
+        ct.delete_link(ev.yt_link.id)

@@ -51,7 +51,7 @@ for event in events:
         if not event.yt_broadcast:
             if event.yt_link:
                 # Link is present, but Stream isn't: Delete the old link
-                ct.delete_stream_link(event)
+                ct.delete_link(event.yt_link.id)
             update.create_youtube(ct, yt, event)
 
         update.update_youtube(yt, event)
