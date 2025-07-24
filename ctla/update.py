@@ -245,11 +245,16 @@ def create_post(ct: ChurchTools, event: Event):
     :param ct: ChurchTools API instance
     :param event: Event to act on
     """
+    # Post creation must not backdate a post
+    now = datetime.datetime.now(datetime.UTC)
+    date = event.end_time
+    if date < now:
+        date = now + timedelta(days=1)
     post_id = ct.create_post(
         group_id=config.churchtools['post_settings']['group_id'],
         title=event.post_title,
         content=event.post_content,
-        date=event.end_time,
+        date=date,
         visibility=config.churchtools['post_settings']['post_visibility'],
         comments_active=config.churchtools['post_settings']['comments_active']
     )
@@ -258,6 +263,10 @@ def create_post(ct: ChurchTools, event: Event):
         name=config.churchtools['post_settings']['attachment_name'],
         link=urllib.parse.urlunsplit(('https', config.churchtools['instance'], f'/posts/{post_id}', '', ''))
     )
+
+    if date != event.end_time:
+        # Post should be backdated but isn't: immediately update (updating a post allows backdating)
+        update_post(ct, event)
 
 
 def update_post(ct: ChurchTools, event: Event):
