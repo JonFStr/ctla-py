@@ -61,9 +61,12 @@ for event in events:
                 update.create_post(ct, event)
             else:
                 update.update_post(ct, event)
+        else:
+            delete.delete_post(ct, event)
 
     else:
         delete.delete_stream(ct, yt, event)
+        delete.delete_post(ct, event)
 
 # WordPress
 if config.wordpress['enabled']:

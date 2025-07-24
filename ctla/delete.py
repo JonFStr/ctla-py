@@ -14,3 +14,15 @@ def delete_stream(ct: ChurchTools, yt: YouTube, ev: Event):
         ev.yt_broadcast = None
     if ev.yt_link:
         ct.delete_link(ev.yt_link.id)
+
+
+def delete_post(ct: ChurchTools, ev: Event):
+    """
+    Delete the event's post from ChurchTools
+
+    :param ct: ChurchTools API instance
+    :param ev: Event whose post shall be deleted
+    """
+    if ev.post_link:
+        ct.delete_post(ev.post_id)
+        ct.delete_link(ev.post_link.id)

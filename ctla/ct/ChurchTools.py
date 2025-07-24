@@ -239,6 +239,18 @@ class ChurchTools(RestAPI):
 
         log.info(f'Updated post {post_id}')
 
+    def delete_post(self, post_id: int):
+        """
+        Delete a post
+
+        :param post_id: ID of the post to remove
+        """
+        log.info(f'Deleting post {post_id}')
+        r = self._do_delete(f'/posts/{post_id}')
+        if r.status_code != 204:
+            log.error(f'Error when deleting post on ChurchTools [{r.status_code}]: "{r.content}"')
+            r.raise_for_status()
+
     def get_calendar_entry(self, event: CtEvent) -> dict[str, Any]:
         """
         Get the calendar entry (appointment) corresponding to the given event
