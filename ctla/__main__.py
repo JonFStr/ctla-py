@@ -65,7 +65,9 @@ for event in events:
             delete.delete_post(ct, event)
 
     else:
-        delete.delete_stream(ct, yt, event)
+        if not event.yt_broadcast or event.yt_broadcast['status']['lifeCycleStatus'] in {'created', 'ready'}:
+            # Only delete Broadcast if it hasn't happened yet
+            delete.delete_stream(ct, yt, event)
         delete.delete_post(ct, event)
 
 # WordPress
