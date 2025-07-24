@@ -1,6 +1,7 @@
 """
 Dataclasses that combine information from different sources
 """
+import logging
 import string
 import urllib.parse
 from dataclasses import dataclass
@@ -12,6 +13,8 @@ from ct.CtEvent import CtEvent
 from ct.Facts import ManageStreamBehavior, YtVisibility
 from yt.type_hints import LiveBroadcast
 from yt.type_hints import PrivacyStatus
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -69,6 +72,20 @@ class Event(CtEvent):
     def yt_description(self) -> str:
         """Apply the YouTube description template configured"""
         return Template(config.youtube['templates']['description']).safe_substitute(**self._substitution_vars).strip()
+
+    @property
+    def post_id(self) -> int:
+        """
+        Extract the post ID from the attachment link :py:attr:`post_link`
+
+        :return: The ID
+        :raise RuntimeError: if any error occurs (post_link not set, unable to extract ID from URL)
+        """
+        try:
+            return int(self.post_link.url.split('/')[-1])
+        except ValueError:
+            log.error(f'Could not parse post id from "{self.post_link.url}"')
+            raise RuntimeError
 
     @property
     def post_title(self) -> str:

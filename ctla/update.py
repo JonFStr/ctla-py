@@ -267,13 +267,7 @@ def update_post(ct: ChurchTools, event: Event):
     :param ct: ChurchTools API instance
     :param event: Event to act on
     """
-    try:
-        post_id = int(event.post_link.url.split('/')[-1])
-    except ValueError:
-        log.error(f'Could not parse post id from "{event.post_link.url}"')
-        raise RuntimeError
-
-    post = ct.get_post(post_id)
+    post = ct.get_post(event.post_id)
 
     title = event.post_title
     content = event.post_content
@@ -282,7 +276,7 @@ def update_post(ct: ChurchTools, event: Event):
     comments = config.churchtools['post_settings']['comments_active']
 
     ct.update_post(
-        post_id,
+        event.post_id,
         title=title if post['title'] != title else None,
         content=content if post['content'] != content else None,
         date=date if datetime.datetime.fromisoformat(post['publicationDate']) != date else None,
