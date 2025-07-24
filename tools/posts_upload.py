@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import html
 import logging
 import operator
@@ -140,7 +141,7 @@ def upload_youtube_posts(group_id: int, targets: list[Post]):
         r = ct._do_patch(f'/posts/{p.ct_status}', {
             'publicationDate': p.date
                          .replace(tzinfo=ZoneInfo('Europe/Berlin'))
-                         .astimezone(ZoneInfo('UTC'))
+                         .astimezone(datetime.UTC)
                          .strftime('%Y-%m-%dT%H:%M:%SZ')
         })
 

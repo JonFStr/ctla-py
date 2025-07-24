@@ -8,10 +8,10 @@ import operator
 import tempfile
 import urllib.parse
 from collections.abc import MutableMapping
+from datetime import timedelta
 from pathlib import Path
 from string import Template
 from typing import ClassVar
-from zoneinfo import ZoneInfo
 
 import config
 from ct.ChurchTools import ChurchTools
@@ -186,7 +186,7 @@ def _render_templates(events: list[Event]) -> dict[str, str]:
 
         rendered = ''
 
-        prev_end: datetime = datetime.datetime.fromtimestamp(0, tz=ZoneInfo('UTC'))
+        prev_end: datetime = datetime.datetime.fromtimestamp(0, tz=datetime.UTC)
         for event in events:
             if not event.facts.on_homepage:
                 continue
