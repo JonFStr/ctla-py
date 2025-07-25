@@ -114,7 +114,7 @@ def _get_thumbnail_uri(title: str) -> str:
     return config.youtube['default_thumbnail_uri']
 
 
-def update_youtube(yt: YouTube, ev: Event):
+def update_youtube(yt: YouTube, ev: Event) -> bool:
     """
     Update the information on YouTube to reflect the one given in ChurchTools.
 
@@ -122,12 +122,14 @@ def update_youtube(yt: YouTube, ev: Event):
 
     :param yt: YouTube service instance
     :param ev: The event to update information for
+    :return: True if a change was made
     """
     if not ev.yt_broadcast:
-        return
+        return False
     bc = ev.yt_broadcast
     bc_snippet = bc.get('snippet', {})
     data = dict()
+    change = False
 
     yt_title = ev.yt_title
     if yt_title != bc_snippet.get('title'):
@@ -150,6 +152,7 @@ def update_youtube(yt: YouTube, ev: Event):
 
     if data:
         bc = yt.set_broadcast_info(bc, **data)
+        change = True
 
     # "instantiation" happens only once, because singleton
     thumbs_cache = ThumbnailCache()
@@ -161,8 +164,11 @@ def update_youtube(yt: YouTube, ev: Event):
     else:
         bc = yt.set_thumbnails(bc, target_thumbnail)
         thumbs_cache[yt_id] = target_thumbnail
+        change = True
 
     ev.yt_broadcast = bc
+
+    return change
 
 
 def _render_templates(events: list[Event]) -> dict[str, str]:
@@ -269,12 +275,13 @@ def create_post(ct: ChurchTools, event: Event):
         update_post(ct, event)
 
 
-def update_post(ct: ChurchTools, event: Event):
+def update_post(ct: ChurchTools, event: Event) -> bool:
     """
     Updates the Post for an event, if necessary
 
     :param ct: ChurchTools API instance
     :param event: Event to act on
+    :return: True if the post was updated
     """
     post = ct.get_post(event.post_id)
 

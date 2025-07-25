@@ -126,6 +126,16 @@ class Event(CtEvent):
         )
 
 
+@dataclass
+class RuntimeStats:
+    """Dataclass to store runtime stats to report to monitor"""
+    total: int = 0
+    new: int = 0
+    updated: int = 0
+    deleted: int = 0
+    skipped: int = 0
+
+
 def _is_video_id(match: str):
     """Returns true if the given string contains only characters that would appear in a YouTube video ID"""
     allowed_chars = set(string.ascii_letters + string.digits + '_-')

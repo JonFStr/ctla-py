@@ -7,14 +7,14 @@ from collections.abc import Generator
 import config
 from ct.ChurchTools import ChurchTools
 from ct.Facts import ManageStreamBehavior
-from data import Event
+from data import Event, RuntimeStats
 from yt.YouTube import YouTube
 from yt.type_hints import LiveBroadcast
 
 log = logging.getLogger(__name__)
 
 
-def gather_event_info(ct: ChurchTools, yt: YouTube) -> Generator[Event]:
+def gather_event_info(ct: ChurchTools, yt: YouTube, stats: RuntimeStats = None) -> Generator[Event]:
     """
     Fetch and return all events to act upon.
 
@@ -22,6 +22,7 @@ def gather_event_info(ct: ChurchTools, yt: YouTube) -> Generator[Event]:
 
     :param ct: The ChurchTools API Instance
     :param yt: The YouTube service instance
+    :param stats: Optional stats object to record number of skipped events
     :return: A list of events
     """
     ct_events = ct.get_upcoming_events(config.churchtools['days_to_load'])
@@ -32,6 +33,8 @@ def gather_event_info(ct: ChurchTools, yt: YouTube) -> Generator[Event]:
 
         if event.facts.behavior == ManageStreamBehavior.IGNORE:
             log.info(f'Skipping event {event}, as it is ignored.')
+            if stats:
+                stats.skipped += 1
             continue
 
         if attach_youtube_broadcast(event, yt, yt_broadcasts):

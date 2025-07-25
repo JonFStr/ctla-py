@@ -11,10 +11,12 @@ import setup
 import update
 from configs import args
 from ct.ChurchTools import ChurchTools
+from data import RuntimeStats
 from wp.WordPress import WordPress
 from yt.YouTube import YouTube
 
 start_time = time.time()
+stats = RuntimeStats()
 
 
 def elapsed_ms() -> int:
@@ -51,34 +53,42 @@ def notify_exit():
 ct = ChurchTools()
 yt = YouTube()
 
-events = list(setup.gather_event_info(ct, yt))
-
+events = list(setup.gather_event_info(ct, yt, stats))
+stats.total = len(events)
 
 log.debug(pprint.pformat(events))
 
 for event in events:
     if event.wants_stream:
+        change = False
+
         if not event.yt_broadcast:
             if event.yt_link:
                 # Link is present, but Stream isn't: Delete the old link
                 ct.delete_link(event.yt_link.id)
 
             update.create_youtube(ct, yt, event)
+            stats.new += 1
 
-        update.update_youtube(yt, event)
+        change |= update.update_youtube(yt, event)
 
         if event.facts.create_post:
             if not event.post_link:
                 update.create_post(ct, event)
+                change |= True
             else:
-                update.update_post(ct, event)
+                change |= update.update_post(ct, event)
         else:
-            delete.delete_post(ct, event)
+            change |= delete.delete_post(ct, event)
+
+        if change:
+            stats.updated += 1
 
     else:
         if not event.yt_broadcast or event.yt_broadcast['status']['lifeCycleStatus'] in {'created', 'ready'}:
             # Only delete Broadcast if it hasn't happened yet
             delete.delete_stream(ct, yt, event)
+            stats.deleted += 1
         delete.delete_post(ct, event)
 
 # WordPress
@@ -87,6 +97,12 @@ if config.wordpress['enabled']:
     update.update_wordpress(wp, [ev for ev in events if ev.yt_link and ev.facts.on_homepage])
 
 if config.monitor_url:
-    requests.get(config.monitor_url.format(status='up', msg='OK', ping=elapsed_ms()))
+    requests.get(config.monitor_url.format(
+        status='up',
+        msg='OK: '
+            f'change:{stats.updated} (new:{stats.new}),del:{stats.deleted} | '
+            f'total:{stats.total} (skip:{stats.skipped})',
+        ping=elapsed_ms()
+    ))
 
 clean_exit = True
