@@ -196,42 +196,14 @@ class ChurchTools(RestAPI):
             r.raise_for_status()
         return r.json()['data']
 
-    def update_post(
-            self,
-            post_id: int,
-            title: Optional[str],
-            content: Optional[str],
-            date: Optional[datetime.datetime],
-            visibility: Optional[PostVisibility],
-            comments_active: Optional[bool]
-    ):
+    def update_post(self, post_id: int, data: dict[str, Any]):
         """
         Update a post with the given parameters.
         All optional parameters may be omitted, and only set parameters will be changed.
 
         :param post_id: ID of the post to update
-        :param title: New title
-        :param content: New content
-        :param date: New publication date
-        :param visibility: new visibility
-        :param comments_active: new comment setting
+        :param data: The new post data
         """
-        data = dict()
-        if title:
-            data['title'] = title
-        if content:
-            data['content'] = content
-        if date:
-            data['publicationDate'] = date.strftime('%Y-%m-%dT%H:%M:%SZ')
-        if visibility:
-            data['visibility'] = visibility
-        if comments_active is not None:
-            data['commentsActive'] = comments_active
-
-        if not data:
-            log.info('No data passed. Will not update post')
-            return
-
         r = self._do_patch(f'/posts/{post_id}', data)
         if r.status_code != 200:
             log.error(f'Could not update post {post_id}: [{r.status_code} - {r.reason}] "{r.content}"')

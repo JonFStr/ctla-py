@@ -284,11 +284,19 @@ def update_post(ct: ChurchTools, event: Event):
     visibility = config.churchtools['post_settings']['post_visibility']
     comments = config.churchtools['post_settings']['comments_active']
 
-    ct.update_post(
-        event.post_id,
-        title=title if post['title'] != title else None,
-        content=content if post['content'] != content else None,
-        date=date if datetime.datetime.fromisoformat(post['publicationDate']) != date else None,
-        visibility=visibility if post['visibility'] != visibility else None,
-        comments_active=comments if post['commentsActive'] != comments else None
-    )
+    data = dict()
+    if post['title'] != title:
+        data['title'] = title
+    if post['content'] != content:
+        data['content'] = content
+    if datetime.datetime.fromisoformat(post['publicationDate']) != date:
+        data['publicationDate'] = date.strftime('%Y-%m-%dT%H:%M:%SZ')
+    if post['visibility'] != visibility:
+        data['visibility'] = visibility
+    if post['commentsActive'] != comments:
+        data['commentsActive'] = comments
+
+    if not data:
+        log.info('Post is already up-to-date, will not update.')
+
+    ct.update_post(event.post_id, data)
