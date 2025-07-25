@@ -18,7 +18,11 @@ start_time = time.time()
 
 
 def elapsed_ms() -> int:
-    """Program runtime, in ms"""
+    """
+    Program runtime, in ms
+
+    Used for reporting to uptime monitor
+    """
     return int((time.time() - start_time) * 1000)
 
 
@@ -28,20 +32,26 @@ log = logging.getLogger(__name__)
 args.parse()
 config.load()
 
-ct = ChurchTools()
-yt = YouTube()
-
-events = list(setup.gather_event_info(ct, yt))
-
 clean_exit = False
-"""failure occurred during run"""
+"""Check if a failure occurred"""
 
 
 @atexit.register
 def notify_exit():
     """Notify external monitor in case of unclean exit"""
     if not clean_exit and config.monitor_url:
-        requests.get(config.monitor_url.format(status='down', msg='Something went wrong.', ping=elapsed_ms()))
+        msg = ''
+        if 'event' in globals() and event is not None:
+            msg = f' during handling of event "{event.title}" ({event.id})'
+        if 'wp' in globals() and wp is not None:
+            msg = f' during update of WordPress'
+        requests.get(config.monitor_url.format(status='down', msg=f'Something went wrong{msg}.', ping=elapsed_ms()))
+
+
+ct = ChurchTools()
+yt = YouTube()
+
+events = list(setup.gather_event_info(ct, yt))
 
 
 log.debug(pprint.pformat(events))
@@ -52,6 +62,7 @@ for event in events:
             if event.yt_link:
                 # Link is present, but Stream isn't: Delete the old link
                 ct.delete_link(event.yt_link.id)
+
             update.create_youtube(ct, yt, event)
 
         update.update_youtube(yt, event)

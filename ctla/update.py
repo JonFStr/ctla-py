@@ -298,5 +298,7 @@ def update_post(ct: ChurchTools, event: Event):
 
     if not data:
         log.info('Post is already up-to-date, will not update.')
+        return False
 
     ct.update_post(event.post_id, data)
+    return True
