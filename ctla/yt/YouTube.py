@@ -51,14 +51,29 @@ class YouTube:
             if config.youtube['stream_key_id'] == 'STREAM_KEY_ID_HERE':
                 raise ValueError
         except (KeyError, ValueError):
-            result = self._service.liveStreams().list(part='snippet', mine=True, maxResults=50).execute()
             log.critical(
                 'No stream key ID has been set. '
                 'Please choose a stream key from the list below and add its ID to Your configuration file:\n'
-                'ID:' + ' ' * 39 + 'Name:\n' +
-                '\n'.join(f'{sk['id']}    "{sk['snippet']['title']}"' for sk in result['items'])
+                + self.format_stream_keys()
             )
             exit(1)
+
+    def format_stream_keys(self) -> str:
+        """Obtain and format configured stream keys for printing to console"""
+        return (
+                'ID:' + ' ' * 39 + 'Name:\n' +
+                '\n'.join(f'{sk_id}    "{sk_title}"' for sk_id, sk_title in self.get_stream_keys().items())
+        )
+
+    def get_stream_keys(self) -> dict[str, str]:
+        """
+        Return all configured stream keys (id -> title)
+        """
+        return {
+            sk['id']: sk['snippet']['title']
+            for sk in
+            self._service.liveStreams().list(part='snippet', mine=True, maxResults=50).execute()['items']
+        }
 
     def close(self):
         oauth.save_credentials(self.credentials)
@@ -107,25 +122,25 @@ class YouTube:
 
         log.info(f'Creating new broadcast "{title}"…')
         result = self._live_broadcasts.insert(part=DEFAULT_PART, body={
-            'snippet': {
+            'snippet'       : {
                 'title': title,
                 'scheduledStartTime': start.astimezone(None).isoformat(),
             },
-            'status': {
+            'status'        : {
                 'privacyStatus': privacy
             },
             'contentDetails': {
-                'monitorStream': {
+                'monitorStream'    : {
                     'enableMonitorStream': broadcast_settings['enable_monitor_stream'],
                     'broadcastStreamDelayMs': broadcast_settings['broadcast_stream_delay_ms']
                 },
-                'enableEmbed': broadcast_settings['enable_embed'],
-                'enableDvr': broadcast_settings['enable_dvr'],
-                'recordFromStart': broadcast_settings['record_from_start'],
+                'enableEmbed'      : broadcast_settings['enable_embed'],
+                'enableDvr'        : broadcast_settings['enable_dvr'],
+                'recordFromStart'  : broadcast_settings['record_from_start'],
                 'closedCaptionsType': broadcast_settings['closed_captions_type'],
                 'latencyPreference': broadcast_settings['latency_preference'],
-                'enableAutoStart': broadcast_settings['enable_auto_start'],
-                'enableAutoStop': broadcast_settings['enable_auto_stop'],
+                'enableAutoStart'  : broadcast_settings['enable_auto_start'],
+                'enableAutoStop'   : broadcast_settings['enable_auto_stop'],
             }
         }).execute()
         return result
@@ -152,8 +167,8 @@ class YouTube:
         if title or desc or start or end:
             parts_to_update.add('snippet')
             body['snippet'] = {
-                'title': title if title else broadcast['snippet']['title'],
-                'description': desc if desc else broadcast['snippet']['description'],
+                'title'           : title if title else broadcast['snippet']['title'],
+                'description'     : desc if desc else broadcast['snippet']['description'],
                 'scheduledStartTime': start.astimezone(None).isoformat() if start else broadcast['snippet'][
                     'scheduledStartTime'],
                 'scheduledEndTime': end.astimezone(None).isoformat() if end else broadcast['snippet'][

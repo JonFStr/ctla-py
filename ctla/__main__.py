@@ -53,6 +53,11 @@ def notify_exit():
 ct = ChurchTools()
 yt = YouTube()
 
+if args.parsed.show_stream_keys:
+    print("These YouTube-Stream keys are available:\n" + yt.format_stream_keys())
+    clean_exit = True
+    exit(1)
+
 events = list(setup.gather_event_info(ct, yt, stats))
 stats.total = len(events)
 

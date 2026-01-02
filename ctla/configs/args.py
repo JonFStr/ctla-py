@@ -25,6 +25,11 @@ def _setup_parser() -> ArgumentParser:
         default='ctla_config.json',
         help='Path to the config file. Defaults to searching for "ctla_config.json" in the current working directory.'
     )
+    parser.add_argument(
+        '--show-stream-keys',
+        action='store_true',
+        help='When given, displays available YouTube stream-keys and exits.'
+    )
     return parser
 
 
