@@ -23,7 +23,7 @@ def fetch_all_songs(page: int):
                     for chunk in response.iter_content(chunk_size=8192):
                         out_file.write(chunk)
 
-config.args.parsed = Namespace(config=open('../example_config.json'))
+config.args.parsed = Namespace(config=open('../ctla_config.json'))
 config.load()
 ct = ChurchTools()
 l = ct._do_get('/songs')
