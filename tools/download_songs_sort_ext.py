@@ -1,9 +1,13 @@
 import os.path
+import threading
 from argparse import Namespace
+from os.path import join
+
 import requests
+
 import config
 from ct.ChurchTools import ChurchTools
-import threading
+
 
 def fetch_all_songs(page: int):
     l = ct._do_get(f'/songs?page={page}')
@@ -17,13 +21,15 @@ def fetch_all_songs(page: int):
                 response = requests.get(f['fileUrl'], stream=True, headers=ct._headers)
                 if ext == 'txt' and '['.encode('utf-8') not in response.content:
                     ext = 'text'
-                if not os.path.exists(ext):
-                    os.mkdir(ext)
-                with open(f'{ext}/{f['name']}', 'wb') as out_file:
+                if not os.path.exists(join('/onedrive', ext)):
+                    os.makedirs(join('/onedrive', ext), exist_ok=True)
+                with open(join('/onedrive', ext, f['name']), 'wb') as out_file:
                     for chunk in response.iter_content(chunk_size=8192):
                         out_file.write(chunk)
+    print(f'Page {page} downloaded\n', end='')
 
-config.args.parsed = Namespace(config=open('../ctla_config.json'))
+
+config.args.parsed = Namespace(config=open('./ctla_config.json'))
 config.load()
 ct = ChurchTools()
 l = ct._do_get('/songs')
@@ -32,7 +38,7 @@ pages = ls['meta']['pagination']['lastPage']
 threads = []
 
 for i in range(pages):
-    t = threading.Thread(target=fetch_all_songs, args=(i+1,))
+    t = threading.Thread(target=fetch_all_songs, args=(i + 1,))
     threads.append(t)
 
 # Start each thread

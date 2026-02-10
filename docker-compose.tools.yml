@@ -1,0 +1,13 @@
+services:
+  tools:
+    build:
+      context: .
+      dockerfile: tools.Dockerfile
+    restart: unless-stopped
+    init: true
+    command: 'sh -c "ln -s -f /usr/src/tools/download_songs.sh /etc/periodic/monthly/download_songs.sh && exec crond -f"'
+    volumes:
+      - ./ctla_config.json:/app/ctla_config.json
+      - ./rclone.config:/app/rclone.config
+    environment:
+      REMOTE_PATH: "/ChurchTools-Songs"
