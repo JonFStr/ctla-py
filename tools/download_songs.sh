@@ -10,6 +10,6 @@ python -u /usr/src/tools/download_songs_sort_ext.py
 
 echo "Download done, beginning upload"
 
-rclone --config /app/rclone.config copy "${OUTPUT_DIR}" "${REMOTE_NAME}:${REMOTE_PATH}"
+rclone --config /app/rclone.config --streaming-upload-cutoff 4M --onedrive-upload-cutoff 4M copy "${OUTPUT_DIR}" "${REMOTE_NAME}:${REMOTE_PATH}"
 
 echo "Upload done"
