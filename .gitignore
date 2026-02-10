@@ -6,4 +6,4 @@
 /client_secret*.json
 
 # Rclone config for tools
-/rclone.config
+/rclone
