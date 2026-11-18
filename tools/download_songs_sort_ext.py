@@ -1,5 +1,5 @@
+import concurrent.futures
 import os.path
-import threading
 from argparse import Namespace
 from os.path import join
 
@@ -37,14 +37,8 @@ ls = l.json()
 pages = ls['meta']['pagination']['lastPage']
 threads = []
 
-for i in range(pages):
-    t = threading.Thread(target=fetch_all_songs, args=(i + 1,))
-    threads.append(t)
-
-# Start each thread
-for t in threads:
-    t.start()
-
-# Wait for all threads to finish
-for t in threads:
-    t.join()
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    for i in range(pages):
+        executor.submit(fetch_all_songs, i + 1)
+    # Wait for all threads
+    executor.shutdown()
