@@ -74,6 +74,10 @@ for event in events:
 
             update.create_youtube(ct, yt, event)
             stats.new += 1
+            # Wait a few seconds for the new stream to be available on the YT API
+            wait_seconds = 10
+            log.debug(f'Waiting {wait_seconds} for the stream to be available in YouTube\'s API…')
+            time.sleep(10)
 
         change |= update.update_youtube(yt, event)
 
